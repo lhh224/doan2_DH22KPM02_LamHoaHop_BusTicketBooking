@@ -1,0 +1,225 @@
+@startuml ERD_BusTicketBooking
+
+' ================================================================
+' Sơ đồ Thực thể Liên kết (ERD) - Hệ thống Đặt Vé Xe Khách
+' Ký hiệu: Crow's Foot (Chân chim)
+' Database: BusTicketBooking - 14 bảng
+' ================================================================
+
+skinparam linetype ortho
+skinparam roundcorner 10
+skinparam class {
+  BackgroundColor #FEFCE8
+  BorderColor #CA8A04
+  ArrowColor #374151
+  FontName Inter
+  FontSize 12
+}
+skinparam entity {
+  BackgroundColor #FFF7ED
+  BorderColor #EA580C
+}
+
+hide circle
+
+entity "Companies" as companies {
+  * **CompanyId** : INT <<PK>> <<IDENTITY>>
+  --
+  CompanyName : NVARCHAR(200) <<NOT NULL>>
+  Phone : NVARCHAR(20)
+  Email : NVARCHAR(100)
+  Address : NVARCHAR(500)
+  Description : NVARCHAR(MAX)
+  Rating : DECIMAL(3,2)
+  CustomerHotline : NVARCHAR(20)
+  IsActive : BIT
+  CreatedAt : DATETIME
+  UpdatedAt : DATETIME
+}
+
+entity "BusTypes" as bustypes {
+  * **BusTypeId** : INT <<PK>> <<IDENTITY>>
+  --
+  BusTypeName : NVARCHAR(100) <<NOT NULL>>
+  TotalSeats : INT <<NOT NULL>>
+  SeatLayout : NVARCHAR(50)
+  Amenities : NVARCHAR(500)
+}
+
+entity "Routes" as routes {
+  * **RouteId** : INT <<PK>> <<IDENTITY>>
+  --
+  RouteName : NVARCHAR(200) <<NOT NULL>>
+  DepartureCity : NVARCHAR(100) <<NOT NULL>>
+  ArrivalCity : NVARCHAR(100) <<NOT NULL>>
+  Distance : INT
+  EstimatedDuration : FLOAT
+  ImageUrl : NVARCHAR(500)
+  IsActive : BIT
+  CreatedAt : DATETIME
+}
+
+entity "Stops" as stops {
+  * **StopId** : INT <<PK>> <<IDENTITY>>
+  --
+  # RouteId : INT <<FK>>
+  StopOrder : INT <<NOT NULL>>
+  StopName : NVARCHAR(200) <<NOT NULL>>
+  StopAddress : NVARCHAR(500)
+  DistanceFromStart : INT
+  Longitude : FLOAT
+  Latitude : FLOAT
+  IsActive : BIT
+  CreatedAt : DATETIME
+}
+
+entity "Trips" as trips {
+  * **TripId** : INT <<PK>> <<IDENTITY>>
+  --
+  # RouteId : INT <<FK>>
+  # CompanyId : INT <<FK>>
+  # BusTypeId : INT <<FK>>
+  DepartureTime : VARCHAR(8)
+  ArrivalTime : VARCHAR(8)
+  DepartureDate : DATE <<NOT NULL>>
+  Price : DECIMAL(10,2) <<NOT NULL>>
+  IsActive : BIT
+  CreatedAt : DATETIME
+  UpdatedAt : DATETIME
+}
+
+entity "Seats" as seats {
+  * **SeatId** : INT <<PK>> <<IDENTITY>>
+  --
+  # TripId : INT <<FK>>
+  SeatCode : NVARCHAR(10) <<NOT NULL>>
+  SeatType : NVARCHAR(50)
+  Status : VARCHAR(20)
+}
+
+entity "Users" as users {
+  * **UserId** : INT <<PK>> <<IDENTITY>>
+  --
+  Username : NVARCHAR(50) <<UNIQUE>>
+  Email : NVARCHAR(100) <<UNIQUE>>
+  Password : NVARCHAR(255) <<NOT NULL>>
+  FullName : NVARCHAR(100) <<NOT NULL>>
+  Phone : NVARCHAR(20)
+  Address : NVARCHAR(500)
+  Role : VARCHAR(20)
+  Status : BIT
+  EmailVerified : BIT
+  CreatedAt : DATETIME
+  UpdatedAt : DATETIME
+  LastLoginAt : DATETIME
+}
+
+entity "Bookings" as bookings {
+  * **BookingId** : INT <<PK>> <<IDENTITY>>
+  --
+  # TripId : INT <<FK>>
+  # UserId : INT <<FK>>
+  TicketCode : NVARCHAR(50)
+  CustomerName : NVARCHAR(100) <<NOT NULL>>
+  CustomerPhone : NVARCHAR(20) <<NOT NULL>>
+  CustomerEmail : NVARCHAR(100)
+  PickupStopOrder : INT
+  DropoffStopOrder : INT
+  SeatCount : INT
+  TotalAmount : DECIMAL(10,2) <<NOT NULL>>
+  Status : VARCHAR(20)
+  BookingDate : DATETIME
+  UpdatedAt : DATETIME
+}
+
+entity "BookingDetails" as bookingdetails {
+  * **BookingDetailId** : INT <<PK>> <<IDENTITY>>
+  --
+  # BookingId : INT <<FK>>
+  SeatCode : NVARCHAR(10) <<NOT NULL>>
+  Price : DECIMAL(10,2)
+}
+
+entity "Payments" as payments {
+  * **PaymentId** : INT <<PK>> <<IDENTITY>>
+  --
+  # BookingId : INT <<FK>>
+  Amount : DECIMAL(10,2) <<NOT NULL>>
+  PaymentMethod : NVARCHAR(50)
+  Status : VARCHAR(20)
+  TransactionId : NVARCHAR(100)
+  PaymentDate : DATETIME
+}
+
+entity "Sessions" as sessions {
+  * **SessionId** : INT <<PK>> <<IDENTITY>>
+  --
+  # UserId : INT <<FK>>
+  Token : NVARCHAR(500)
+  RefreshToken : NVARCHAR(500)
+  ExpiresAt : DATETIME
+  CreatedAt : DATETIME
+}
+
+entity "Notifications" as notifications {
+  * **NotificationId** : INT <<PK>> <<IDENTITY>>
+  --
+  # UserId : INT <<FK>>
+  Title : NVARCHAR(200)
+  Content : NVARCHAR(MAX)
+  Type : VARCHAR(20)
+  IsRead : BIT
+  CreatedAt : DATETIME
+  ReadAt : DATETIME
+}
+
+entity "Transactions" as transactions {
+  * **TransactionId** : INT <<PK>> <<IDENTITY>>
+  --
+  # BookingId : INT <<FK>>
+  Amount : DECIMAL(10,2) <<NOT NULL>>
+  PaymentMethod : NVARCHAR(50)
+  Status : VARCHAR(20)
+  ExternalTransactionId : NVARCHAR(100)
+  Note : NVARCHAR(500)
+  CreatedAt : DATETIME
+}
+
+entity "Reviews" as reviews {
+  * **ReviewId** : INT <<PK>> <<IDENTITY>>
+  --
+  # BookingId : INT <<FK>>
+  # UserId : INT <<FK>>
+  # TripId : INT <<FK>>
+  # CompanyId : INT <<FK>>
+  Rating : INT <<NOT NULL>> <<CHECK 1-5>>
+  Title : NVARCHAR(200)
+  Content : NVARCHAR(MAX)
+  Status : VARCHAR(20)
+  CreatedAt : DATETIME
+  ApprovedAt : DATETIME
+}
+
+' ================================================================
+' QUAN HỆ (Crow's Foot Notation)
+' ||--o{ = 1 bắt buộc - N tùy chọn
+' ================================================================
+
+routes ||--o{ stops : "có nhiều"
+routes ||--o{ trips : "có nhiều"
+companies ||--o{ trips : "vận hành"
+bustypes ||--o{ trips : "sử dụng"
+trips ||--o{ seats : "có nhiều"
+trips ||--o{ bookings : "được đặt"
+users ||--o{ bookings : "đặt vé"
+bookings ||--o{ bookingdetails : "bao gồm"
+bookings ||--o{ payments : "thanh toán"
+bookings ||--o{ transactions : "ghi nhận"
+bookings ||--o{ reviews : "được đánh giá"
+users ||--o{ sessions : "đăng nhập"
+users ||--o{ notifications : "nhận"
+users ||--o{ reviews : "viết"
+trips ||--o{ reviews : "được đánh giá"
+companies ||--o{ reviews : "được đánh giá"
+
+@enduml

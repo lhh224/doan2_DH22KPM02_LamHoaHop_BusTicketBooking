@@ -1,0 +1,69 @@
+{
+  "templateId": "vip-cabin-22",
+  "name": "VIP Cabin 22 chỗ",
+  "busType": "VIP Cabin",
+  "totalSeats": 22,
+  "description": "Xe VIP Cabin 22 phòng: 20 phòng tầng dưới (dãy A+B), 2 phòng VIP tầng trên (dãy C)",
+  "layout": {
+    "type": "double-floor",
+    "orientation": "vertical",
+    "floors": [
+      {
+        "id": "floor-1",
+        "label": "Tầng dưới",
+        "sections": [
+          {
+            "id": "f1-main",
+            "type": "vertical-columns",
+            "structure": [
+              {
+                "column": "Trai",
+                "label": "Dãy trái",
+                "seats": ["A01", "A02", "A03", "A04", "A05"]
+              },
+              {
+                "column": "Phai",
+                "label": "Dãy phải",
+                "seats": ["A06", "A07", "A08", "A09", "A10"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "floor-2",
+        "label": "Tầng trên",
+        "sections": [
+          {
+            "id": "f2-main",
+            "type": "vertical-columns",
+            "structure": [
+              {
+                "column": "Trai",
+                "label": "Dãy trái",
+                "seats": ["B01", "B02", "B03", "B04", "B05", "B06"]
+              },
+              {
+                "column": "Phai",
+                "label": "Dãy phải",
+                "seats": ["B07", "B08", "B09", "B10", "C01", "C02"]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "rendering": {
+    "seatWidth": "70px",
+    "seatHeight": "90px",
+    "gap": "15px",
+    "columnGap": "50px",
+    "floorGap": "60px"
+  },
+  "metadata": {
+    "version": "1.0",
+    "createdDate": "2026-02-06",
+    "author": "System"
+  }
+}

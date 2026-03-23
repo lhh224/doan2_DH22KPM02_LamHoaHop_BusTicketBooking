@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vé Xe Của Bạn - Đặt Vé Xe Khách</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <style>
+      /* Success Page Specific Styles */
+      .ticket-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+
+      .ticket-success-header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .success-lottie-mock {
+        width: 100px;
+        height: 100px;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        animation: success-pulse 2s infinite;
+      }
+
+      @keyframes success-pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+
+        50% {
+          transform: scale(1.05);
+          opacity: 0.8;
+        }
+
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .ticket-success-header h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Digital Ticket Container */
+      .digital-ticket-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        align-items: start;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      /* Adjusting payment.css card for this page */
+      .ticket-card-modern {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .ticket-banner-modern {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        padding: 2.5rem;
+        text-align: center;
+        color: white;
+        position: relative;
+      }
+
+      .ticket-banner-modern h2 {
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+      }
+
+      .ticket-code-modern {
+        font-size: 2.5rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.2rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .ticket-main-body {
+        padding: 2.5rem;
+      }
+
+      .ticket-group {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .ticket-group:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .group-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--gray-medium);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+      }
+
+      .ticket-route-box {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .route-stop {
+        text-align: center;
+      }
+
+      .stop-time {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--dark-color);
+      }
+
+      .stop-name {
+        font-size: 0.9rem;
+        color: var(--gray-dark);
+        margin-top: 0.2rem;
+      }
+
+      .route-path {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 1rem;
+      }
+
+      .path-line {
+        height: 2px;
+        background: var(--primary-light);
+        width: 100%;
+        position: relative;
+        margin: 0.5rem 0;
+      }
+
+      .path-line::after {
+        content: "→";
+        position: absolute;
+        right: -5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-light);
+        font-weight: bold;
+      }
+
+      .grid-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      .info-pair {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+
+      .pair-label {
+        font-size: 0.8rem;
+        color: var(--gray-medium);
+      }
+
+      .pair-value {
+        font-weight: 700;
+        color: var(--dark-color);
+      }
+
+      .seat-tags {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+
+      .seat-tag {
+        background: var(--primary-light);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      .ticket-qr-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px dashed #f1f5f9;
+      }
+
+      .qr-holder {
+        display: inline-block;
+        padding: 1rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+      }
+
+      .qr-footer-text {
+        font-size: 0.9rem;
+        color: var(--gray-dark);
+      }
+
+      .ticket-actions-row {
+        margin-top: 3rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+
+      /* Notes card */
+      .notes-card {
+        margin-top: 2rem;
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        border-radius: 16px;
+        padding: 1.5rem;
+      }
+
+      .notes-card h4 {
+        color: #92400e;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .notes-list {
+        list-style: none;
+      }
+
+      .notes-list li {
+        color: #92400e;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .notes-list li::before {
+        content: "•";
+        font-weight: bold;
+      }
+
+      @media (max-width: 600px) {
+        .grid-info {
+          grid-template-columns: 1fr;
+        }
+
+        .ticket-route-box {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .path-line {
+          width: 2px;
+          height: 30px;
+        }
+
+        .path-line::after {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-content">
+          <div class="logo">
+            <i class="fas fa-bus"></i>
+            <span>DatVeNhanh</span>
+          </div>
+          <ul class="nav-menu">
+            <li>
+              <a href="index.html"><i class="fas fa-home"></i> Trang Chủ</a>
+            </li>
+            <li>
+              <a href="trip-tracking.html"
+                ><i class="fas fa-map-marked-alt"></i> Theo Dõi</a
+              >
+            </li>
+            <li>
+              <a href="ticket.html" class="active"
+                ><i class="fas fa-ticket-alt"></i> Vé Của Tôi</a
+              >
+            </li>
+            <li>
+              <a href="login.html"
+                ><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a
+              >
+            </li>
+            <li>
+              <a href="register.html" class="btn-register"
+                ><i class="fas fa-user-plus"></i> Đăng Ký</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="ticket-container">
+      <!-- Form Tra Cứu Vé (Hiển thị khi không có vé) -->
+      <div
+        id="searchTicketSection"
+        style="display: none; max-width: 500px; margin: 0 auto"
+      >
+        <div
+          class="ticket-card-modern"
+          style="padding: 2.5rem; text-align: center"
+        >
+          <h2 style="margin-bottom: 2rem; color: var(--dark-color)">
+            Tra cứu vé của bạn
+          </h2>
+          <div style="margin-bottom: 1.5rem; text-align: left">
+            <label
+              for="searchPhone"
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                color: var(--gray-dark);
+              "
+              >Số điện thoại đặt vé</label
+            >
+            <input
+              type="text"
+              id="searchPhone"
+              placeholder="Nhập số điện thoại..."
+              style="
+                width: 100%;
+                padding: 0.8rem 1rem;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                font-size: 1rem;
+              "
+            />
+          </div>
+          <button
+            id="btnSearchTicket"
+            style="
+              width: 100%;
+              padding: 1rem;
+              background: var(--primary-color);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 1.1rem;
+              font-weight: 600;
+              cursor: pointer;
+              transition: background 0.3s;
+            "
+          >
+            Tra cứu
+          </button>
+          <div
+            id="searchError"
+            style="
+              color: var(--danger-color);
+              margin-top: 1rem;
+              display: none;
+              background: rgba(239, 68, 68, 0.1);
+              padding: 0.8rem;
+              border-radius: 8px;
+              font-size: 0.9rem;
+            "
+          ></div>
+        </div>
+      </div>
+
+      <div id="loadingMessage" class="loading">
+        <i
+          class="fas fa-ticket-alt fa-3x fa-fade"
+          style="color: var(--primary-color)"
+        ></i>
+        <p>Đang tải thông tin vé...</p>
+      </div>
+
+      <div
+        id="errorMessage"
+        class="alert alert-error"
+        style="display: none"
+      ></div>
+
+      <div id="ticketContent" style="display: none">
+        <!-- Success Header -->
+        <div class="ticket-success-header animate-fade-in">
+          <div class="success-lottie-mock">
+            <i class="fas fa-check"></i>
+          </div>
+          <h1>Đặt Vé Thành Công!</h1>
+          <p>Cảm ơn bạn đã tin tưởng dịch vụ DatVeNhanh</p>
+        </div>
+
+        <div class="digital-ticket-wrapper">
+          <!-- Main Ticket Card -->
+          <div class="ticket-card-modern animate-slide-in-up">
+            <div class="ticket-banner-modern">
+              <h2>Vé Xe Điện Tử</h2>
+              <div class="ticket-code-modern" id="ticketCode">VE-2023-XXXX</div>
+              <!-- Barcode will be injected here -->
+              <div
+                style="
+                  display: flex;
+                  justify-content: center;
+                  margin-bottom: 1rem;
+                "
+              >
+                <svg
+                  id="barcode"
+                  style="
+                    display: none;
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 8px;
+                  "
+                ></svg>
+              </div>
+              <div style="margin-top: 0.5rem">
+                <div class="status-pill" id="statusBadge">ĐÃ THANH TOÁN</div>
+              </div>
+            </div>
+
+            <div class="ticket-main-body">
+              <!-- Route Info -->
+              <div class="ticket-group">
+                <div class="group-title">
+                  <i class="fas fa-route"></i> Thông tin lộ trình
+                </div>
+                <div class="ticket-route-box">
+                  <div class="route-stop">
+                    <div class="stop-time" id="departureTime">00:00</div>
+                    <div class="stop-name" id="fromCity">Sài Gòn</div>
+                  </div>
+                  <div class="route-path">
+                    <div
+                      style="font-size: 0.8rem; color: var(--gray-medium)"
+                      id="duration"
+                    >
+                      ~0h
+                    </div>
+                    <div class="path-line"></div>
+                  </div>
+                  <div class="route-stop">
+                    <div class="stop-time" id="arrivalTime">00:00</div>
+                    <div class="stop-name" id="toCity">Đà Lạt</div>
+                  </div>
+                </div>
+
+                <div class="grid-info">
+                  <div class="info-pair">
+                    <span class="pair-label">Ngày khởi hành</span>
+                    <span class="pair-value" id="departureDate"
+                      >--/--/----</span
+                    >
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Nhà xe</span>
+                    <span class="pair-value" id="companyName">----</span>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Loại xe</span>
+                    <span class="pair-value" id="busType">----</span>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Biển số xe</span>
+                    <span class="pair-value" id="licensePlate"
+                      >Sẽ cập nhật</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pickup Points -->
+              <div class="ticket-group">
+                <div class="group-title">
+                  <i class="fas fa-map-marker-alt"></i> Điểm đón & trả
+                </div>
+                <div class="grid-info">
+                  <div class="info-pair">
+                    <span class="pair-label">Điểm đón</span>
+                    <span class="pair-value" id="fromStop">----</span>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Điểm trả</span>
+                    <span class="pair-value" id="toStop">----</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Seats & Customer -->
+              <div class="ticket-group">
+                <div class="group-title">
+                  <i class="fas fa-chair"></i> Thông tin ghế & Khách hàng
+                </div>
+                <div class="grid-info">
+                  <div class="info-pair">
+                    <span class="pair-label">Ghế ngồi</span>
+                    <div class="seat-tags" id="seatsDisplay">
+                      <!-- Rendered via JS -->
+                    </div>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Hành khách</span>
+                    <span class="pair-value" id="customerName">----</span>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Số điện thoại</span>
+                    <span class="pair-value" id="customerPhone">----</span>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Email</span>
+                    <span class="pair-value" id="customerEmail">----</span>
+                  </div>
+                  <div class="info-pair">
+                    <span class="pair-label">Ngày đặt vé</span>
+                    <span class="pair-value" id="bookingDate">----</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Total Paid -->
+              <div
+                class="ticket-group"
+                style="
+                  padding-top: 1.5rem;
+                  border-top: 1px dashed #e2e8f0;
+                  border-bottom: none;
+                  margin-bottom: 0;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <span style="font-weight: 700; color: #000000"
+                    >Tổng tiền thanh toán</span
+                  >
+                  <span
+                    style="font-size: 1.5rem; font-weight: 900; color: #000000"
+                    id="totalAmount"
+                    >0 VNĐ</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="notes-card animate-fade-in-delay-1">
+            <h4><i class="fas fa-exclamation-circle"></i> Lưu ý quan trọng</h4>
+            <ul class="notes-list">
+              <li>Vui lòng có mặt tại điểm đón trước 15 phút</li>
+              <li>Mang theo CCCD để kiểm tra khi cần</li>
+              <li>Xuất trình mã QR vé hoặc mã vé khi lên xe</li>
+              <li>
+                Liên hệ tổng đài <strong>1900-XXXX</strong> nếu cần hỗ trợ
+              </li>
+              <li>Hủy vé trước 24h để được hoàn tiền</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="assets/js/auth-nav.js"></script>
+    <script src="assets/js/ticket.js"></script>
+  </body>
+</html>

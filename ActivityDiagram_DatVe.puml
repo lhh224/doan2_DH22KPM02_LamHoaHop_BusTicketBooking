@@ -1,0 +1,163 @@
+@startuml ActivityDiagram_DatVe
+
+' ================================================================
+' Sơ đồ Hoạt động (Activity Diagram) - Luồng Đặt Vé Xe Khách
+' Database: BusTicketBooking
+' ================================================================
+
+skinparam activity {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+  FontName Inter
+  FontSize 13
+  FontColor #0D1B2A
+  DiamondBackgroundColor #BBDEFB
+  DiamondBorderColor #1565C0
+  DiamondFontColor #0D1B2A
+  ArrowColor #1E88E5
+  ArrowFontColor #1565C0
+  ArrowFontSize 11
+  StartColor #1565C0
+  EndColor #0D47A1
+  BarColor #1E88E5
+}
+
+skinparam note {
+  BackgroundColor #FFF9C4
+  BorderColor #F9A825
+  FontSize 11
+  FontColor #4E342E
+}
+
+skinparam shadowing false
+skinparam roundcorner 12
+
+title <b>Sơ đồ Hoạt động: Luồng Đặt Vé Xe Khách Trực Tuyến</b>
+
+' ========================
+' BẮT ĐẦU
+' ========================
+start
+
+:Người dùng truy cập **Trang Chủ**\n(index.html);
+
+:Nhập điểm đi, điểm đến, ngày khởi hành;
+
+:Nhấn nút **"Tìm Chuyến"**;
+
+note right
+  **API:** GET /api/v1/trips/search
+  ?from=...&to=...&date=...
+  Trả về danh sách chuyến xe khả dụng
+end note
+
+:Hệ thống hiển thị **danh sách chuyến xe**\n(nhà xe, giờ, giá, loại xe);
+
+if (Có chuyến phù hợp?) then (Có)
+  :Người dùng chọn chuyến xe\nvà nhấn **"Xem sơ đồ ghế"**;
+  note right
+    **API:** GET /api/v1/trips/:tripId
+    Lấy chi tiết chuyến xe
+  end note
+else (Không)
+  :Hiển thị thông báo\n"Không tìm thấy chuyến phù hợp";
+  stop
+endif
+
+' ========================
+' TRANG SƠ ĐỒ GHẾ
+' ========================
+:Chuyển đến trang **Sơ đồ Ghế**\n(seat-map.html?tripId=...);
+
+:Chọn **điểm đón** và **điểm trả** (Stop);
+
+note right
+  **API:** GET /api/v1/seats
+  ?tripId=...&fromStopOrder=...&toStopOrder=...
+  Trả về trạng thái ghế theo chặng
+end note
+
+:Hệ thống hiển thị sơ đồ ghế\n(trắng = trống, xám = đã đặt);
+
+:Người dùng click chọn ghế trên sơ đồ;
+
+:Nhập **Họ tên** và **Số điện thoại**;
+
+:Nhấn nút **"Đặt Vé Ngay"**;
+
+' ========================
+' KIỂM TRA VÀ KHÓA GHẾ
+' ========================
+note right
+  **API:** POST /api/v1/bookings/lock
+  Gọi **sp_LockSeats** với
+  SERIALIZABLE isolation level
+  để tránh race condition
+end note
+
+:Hệ thống gọi **sp_LockSeats**\n(kiểm tra xung đột chặng);
+
+if (Ghế đã bị đặt\ntrong chặng này?) then (Đã bị đặt)
+  :Hiển thị lỗi:\n<color:#B71C1C>"Một số ghế đã được đặt\ntrong chặng này"</color>;
+  :Quay lại chọn ghế khác;
+  note left
+    Người dùng quay lại
+    bước chọn ghế,
+    sơ đồ tự cập nhật
+  end note
+  :Hệ thống hiển thị sơ đồ ghế\n(trắng = trống, xám = đã đặt);
+  :Người dùng click chọn ghế trên sơ đồ;
+  :Nhập **Họ tên** và **Số điện thoại**;
+  :Nhấn nút **"Đặt Vé Ngay"**;
+else (Còn trống)
+  :Tạo **Booking** mới\n(Status = PENDING, TicketCode sinh tự động);
+  note right
+    Booking bị huỷ tự động
+    sau 15 phút nếu chưa thanh toán
+  end note
+endif
+
+' ========================
+' TRANG THANH TOÁN
+' ========================
+:Chuyển đến trang **Thanh Toán**\n(checkout.html?bookingId=...);
+
+note right
+  **API:** POST /api/v1/payments/qr
+  Sinh mã QR thanh toán (giả lập)
+  chứa thông tin booking & số tiền
+end note
+
+:Hiển thị tóm tắt đơn hàng\nvà **mã QR thanh toán**;
+
+:Người dùng xác nhận thanh toán\nvà nhấn **"Xác Nhận Đã Thanh Toán"**;
+
+note right
+  **API:** POST /api/v1/bookings/confirm
+  Gọi **sp_ConfirmPayment**:
+  - Booking: PENDING → PAID
+  - INSERT INTO Payments (COMPLETED)
+  - INSERT INTO Transactions (SUCCESS)
+end note
+
+:Hệ thống gọi **sp_ConfirmPayment**;
+
+if (Booking có hợp lệ\nvà đang PENDING?) then (Hợp lệ)
+  :Cập nhật Booking → **PAID**\nTạo bản ghi Payment & Transaction;
+else (Lỗi / Đã thanh toán)
+  :Hiển thị lỗi:\n<color:#B71C1C>"Đơn đặt vé không hợp lệ\nhoặc đã được xử lý"</color>;
+  stop
+endif
+
+:Chuyển đến trang **Vé Xe**\n(ticket.html?bookingId=...);
+
+:Hiển thị **vé điện tử** với\nmã vé TicketCode và mã vạch (Barcode);
+
+' ========================
+' KẾT THÚC
+' ========================
+:✅ **Hoàn tất đặt vé!**\nXuất trình vé điện tử khi lên xe;
+
+stop
+
+@enduml

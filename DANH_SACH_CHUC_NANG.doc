@@ -1,0 +1,220 @@
+﻿<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Bảng Phân Rã Chức Năng Hệ Thống Đặt Vé Xe Khách</title>
+<style>
+    body { font-family: 'Times New Roman', Times, serif; font-size: 13pt; line-height: 1.5; }
+    h1 { text-align: center; font-size: 16pt; font-weight: bold; color: #000; margin-bottom: 20pt; }
+    h2 { font-size: 14pt; font-weight: bold; color: #000; margin-top: 15pt; margin-bottom: 10pt; }
+    h3 { font-size: 13pt; font-weight: bold; color: #000; margin-top: 12pt; margin-bottom: 8pt; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 15pt; }
+    th, td { border: 1px solid #000; padding: 6pt 8pt; text-align: left; vertical-align: top; }
+    th { background-color: #d9e2f3; font-weight: bold; text-align: center; }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>BẢNG PHÂN RÃ CHỨC NĂNG<br>HỆ THỐNG ĐẶT VÉ XE KHÁCH TRỰC TUYẾN</h1>
+
+<h2>I. Bảng Danh Sách Chức Năng Tổng Hợp</h2>
+
+<table>
+    <tr>
+        <th style="width: 5%;">STT</th>
+        <th style="width: 15%;">F0 (Đối tượng)</th>
+        <th style="width: 25%;">F1 (Nhóm chức năng)</th>
+        <th style="width: 55%;">F2 (Chức năng chi tiết)</th>
+    </tr>
+    <tr><td class="center">1</td><td rowspan="14" class="center bold">Khách vãng lai<br>(Guest)</td><td rowspan="4">Tìm kiếm chuyến xe</td><td>Tìm chuyến xe theo tuyến</td></tr>
+    <tr><td class="center">2</td><td>Tìm chuyến xe theo ngày khởi hành</td></tr>
+    <tr><td class="center">3</td><td>Tìm chuyến xe theo loại xe</td></tr>
+    <tr><td class="center">4</td><td>Xem danh sách chuyến xe</td></tr>
+    <tr><td class="center">5</td><td rowspan="3">Xem thông tin chuyến</td><td>Xem chi tiết chuyến xe</td></tr>
+    <tr><td class="center">6</td><td>Xem thông tin nhà xe</td></tr>
+    <tr><td class="center">7</td><td>Xem giá vé</td></tr>
+    <tr><td class="center">8</td><td rowspan="3">Xem sơ đồ ghế</td><td>Xem sơ đồ ghế</td></tr>
+    <tr><td class="center">9</td><td>Xem trạng thái ghế (trống/đã đặt)</td></tr>
+    <tr><td class="center">10</td><td>Xem ghế theo chặng</td></tr>
+    <tr><td class="center">11</td><td rowspan="3">Theo dõi hành trình</td><td>Xem định vị và thông tin chuyến xe đang chạy</td></tr>
+    <tr><td class="center">12</td><td>Xem tiến độ chuyến xe thời gian thực</td></tr>
+    <tr><td class="center">13</td><td>Xem vị trí và trạng thái các điểm dừng</td></tr>
+    <tr><td class="center">14</td><td>Hỗ trợ trực tuyến</td><td>Chat với trợ lý AI</td></tr>
+
+    <tr><td class="center">15</td><td rowspan="18" class="center bold">Khách hàng<br>(Customer)</td><td rowspan="5">Quản lý tài khoản</td><td>Đăng ký tài khoản mới</td></tr>
+    <tr><td class="center">16</td><td>Đăng nhập hệ thống</td></tr>
+    <tr><td class="center">17</td><td>Đăng xuất hệ thống</td></tr>
+    <tr><td class="center">18</td><td>Xem thông tin cá nhân</td></tr>
+    <tr><td class="center">19</td><td>Cập nhật thông tin cá nhân</td></tr>
+    <tr><td class="center">20</td><td rowspan="5">Đặt vé</td><td>Chọn ghế trên sơ đồ</td></tr>
+    <tr><td class="center">21</td><td>Khóa ghế tạm thời</td></tr>
+    <tr><td class="center">22</td><td>Nhập thông tin hành khách</td></tr>
+    <tr><td class="center">23</td><td>Xác nhận đặt vé</td></tr>
+    <tr><td class="center">24</td><td>Hủy đặt vé</td></tr>
+    <tr><td class="center">25</td><td rowspan="3">Thanh toán</td><td>Tạo mã QR thanh toán</td></tr>
+    <tr><td class="center">26</td><td>Xác nhận thanh toán</td></tr>
+    <tr><td class="center">27</td><td>Xem trạng thái thanh toán</td></tr>
+    <tr><td class="center">28</td><td rowspan="3">Quản lý vé</td><td>Xem vé đã đặt</td></tr>
+    <tr><td class="center">29</td><td>Tải vé PDF</td></tr>
+    <tr><td class="center">30</td><td>Xem mã QR vé</td></tr>
+    <tr><td class="center">31</td><td rowspan="2">Lịch sử đặt vé</td><td>Xem lịch sử đặt vé</td></tr>
+    <tr><td class="center">32</td><td>Xem chi tiết booking</td></tr>
+
+    <tr><td class="center">33</td><td rowspan="33" class="center bold">Admin/<br>Nhà xe</td><td rowspan="4">Quản lý tuyến xe</td><td>Thêm tuyến xe mới</td></tr>
+    <tr><td class="center">34</td><td>Sửa thông tin tuyến xe</td></tr>
+    <tr><td class="center">35</td><td>Xóa tuyến xe</td></tr>
+    <tr><td class="center">36</td><td>Xem danh sách tuyến xe</td></tr>
+    <tr><td class="center">37</td><td rowspan="4">Quản lý điểm dừng</td><td>Thêm điểm dừng mới</td></tr>
+    <tr><td class="center">38</td><td>Sửa thông tin điểm dừng</td></tr>
+    <tr><td class="center">39</td><td>Xóa điểm dừng</td></tr>
+    <tr><td class="center">40</td><td>Xem danh sách điểm dừng</td></tr>
+    <tr><td class="center">41</td><td rowspan="5">Quản lý chuyến xe</td><td>Thêm chuyến xe mới</td></tr>
+    <tr><td class="center">42</td><td>Sửa thông tin chuyến xe</td></tr>
+    <tr><td class="center">43</td><td>Xóa chuyến xe</td></tr>
+    <tr><td class="center">44</td><td>Xem danh sách chuyến xe</td></tr>
+    <tr><td class="center">45</td><td>Lọc chuyến theo trạng thái</td></tr>
+    <tr><td class="center">46</td><td rowspan="4">Quản lý nhà xe</td><td>Thêm nhà xe mới</td></tr>
+    <tr><td class="center">47</td><td>Sửa thông tin nhà xe</td></tr>
+    <tr><td class="center">48</td><td>Xóa nhà xe</td></tr>
+    <tr><td class="center">49</td><td>Xem danh sách nhà xe</td></tr>
+    <tr><td class="center">50</td><td rowspan="4">Quản lý đặt vé</td><td>Xem danh sách đặt vé</td></tr>
+    <tr><td class="center">51</td><td>Xác nhận thanh toán khách hàng</td></tr>
+    <tr><td class="center">52</td><td>Phát hành vé PDF</td></tr>
+    <tr><td class="center">53</td><td>Xem chi tiết đặt vé</td></tr>
+    <tr><td class="center">54</td><td rowspan="2">Quản lý ghế</td><td>Xem sơ đồ ghế chuyến xe</td></tr>
+    <tr><td class="center">55</td><td>Quản lý trạng thái ghế</td></tr>
+    <tr><td class="center">56</td><td rowspan="4">Dashboard và Thống kê</td><td>Xem số liệu tổng quát (tổng doanh thu, giao dịch)</td></tr>
+    <tr><td class="center">57</td><td>Xem thống kê doanh thu theo thời gian</td></tr>
+    <tr><td class="center">58</td><td>Xem thống kê doanh thu theo nhà xe/tuyến đường</td></tr>
+    <tr><td class="center">59</td><td>Phân tích phương thức thanh toán</td></tr>
+    <tr><td class="center">60</td><td rowspan="2">Quản lý đánh giá</td><td>Xem danh sách chi tiết đánh giá chuyến đi</td></tr>
+    <tr><td class="center">61</td><td>Cập nhật trạng thái duyệt/ẩn đánh giá</td></tr>
+    <tr><td class="center">62</td><td rowspan="2">Nhật ký hệ thống (Logs)</td><td>Xem lịch sử truy cập đăng nhập</td></tr>
+    <tr><td class="center">63</td><td>Xem nhật ký thao tác và giao dịch hệ thống</td></tr>
+    <tr><td class="center">64</td><td rowspan="2">Quản lý tài khoản</td><td>Xem danh sách người dùng và nhân viên</td></tr>
+    <tr><td class="center">65</td><td>Tạo tài khoản nhân viên / Mở khóa, khóa tài khoản</td></tr>
+</table>
+
+<h2>II. Bảng Chi Tiết Theo Từng Đối Tượng</h2>
+
+<h3>1. Khách vãng lai (Guest)</h3>
+<table>
+    <tr><th style="width: 8%;">STT</th><th style="width: 35%;">F1 (Nhóm chức năng)</th><th style="width: 57%;">F2 (Chức năng chi tiết)</th></tr>
+    <tr><td class="center">1</td><td rowspan="4">Tìm kiếm chuyến xe</td><td>Tìm chuyến xe theo tuyến</td></tr>
+    <tr><td class="center">2</td><td>Tìm chuyến xe theo ngày khởi hành</td></tr>
+    <tr><td class="center">3</td><td>Tìm chuyến xe theo loại xe</td></tr>
+    <tr><td class="center">4</td><td>Xem danh sách chuyến xe</td></tr>
+    <tr><td class="center">5</td><td rowspan="3">Xem thông tin chuyến</td><td>Xem chi tiết chuyến xe</td></tr>
+    <tr><td class="center">6</td><td>Xem thông tin nhà xe</td></tr>
+    <tr><td class="center">7</td><td>Xem giá vé</td></tr>
+    <tr><td class="center">8</td><td rowspan="3">Xem sơ đồ ghế</td><td>Xem sơ đồ ghế</td></tr>
+    <tr><td class="center">9</td><td>Xem trạng thái ghế (trống/đã đặt)</td></tr>
+    <tr><td class="center">10</td><td>Xem ghế theo chặng</td></tr>
+    <tr><td class="center">11</td><td rowspan="3">Theo dõi hành trình</td><td>Xem định vị và thông tin chuyến xe đang chạy</td></tr>
+    <tr><td class="center">12</td><td>Xem tiến độ chuyến xe thời gian thực</td></tr>
+    <tr><td class="center">13</td><td>Xem vị trí và trạng thái các điểm dừng</td></tr>
+    <tr><td class="center">14</td><td>Hỗ trợ trực tuyến</td><td>Chat với trợ lý AI</td></tr>
+</table>
+
+<h3>2. Khách hàng (Customer)</h3>
+<table>
+    <tr><th style="width: 8%;">STT</th><th style="width: 35%;">F1 (Nhóm chức năng)</th><th style="width: 57%;">F2 (Chức năng chi tiết)</th></tr>
+    <tr><td class="center">1</td><td rowspan="5">Quản lý tài khoản</td><td>Đăng ký tài khoản mới</td></tr>
+    <tr><td class="center">2</td><td>Đăng nhập hệ thống</td></tr>
+    <tr><td class="center">3</td><td>Đăng xuất hệ thống</td></tr>
+    <tr><td class="center">4</td><td>Xem thông tin cá nhân</td></tr>
+    <tr><td class="center">5</td><td>Cập nhật thông tin cá nhân</td></tr>
+    <tr><td class="center">6</td><td rowspan="5">Đặt vé</td><td>Chọn ghế trên sơ đồ</td></tr>
+    <tr><td class="center">7</td><td>Khóa ghế tạm thời</td></tr>
+    <tr><td class="center">8</td><td>Nhập thông tin hành khách</td></tr>
+    <tr><td class="center">9</td><td>Xác nhận đặt vé</td></tr>
+    <tr><td class="center">10</td><td>Hủy đặt vé</td></tr>
+    <tr><td class="center">11</td><td rowspan="3">Thanh toán</td><td>Tạo mã QR thanh toán</td></tr>
+    <tr><td class="center">12</td><td>Xác nhận thanh toán</td></tr>
+    <tr><td class="center">13</td><td>Xem trạng thái thanh toán</td></tr>
+    <tr><td class="center">14</td><td rowspan="3">Quản lý vé</td><td>Xem vé đã đặt</td></tr>
+    <tr><td class="center">15</td><td>Tải vé PDF</td></tr>
+    <tr><td class="center">16</td><td>Xem mã QR vé</td></tr>
+    <tr><td class="center">17</td><td rowspan="2">Lịch sử đặt vé</td><td>Xem lịch sử đặt vé</td></tr>
+    <tr><td class="center">18</td><td>Xem chi tiết booking</td></tr>
+</table>
+
+<h3>3. Admin / Nhà xe</h3>
+<table>
+    <tr><th style="width: 8%;">STT</th><th style="width: 35%;">F1 (Nhóm chức năng)</th><th style="width: 57%;">F2 (Chức năng chi tiết)</th></tr>
+    <tr><td class="center">1</td><td rowspan="4">Quản lý tuyến xe</td><td>Thêm tuyến xe mới</td></tr>
+    <tr><td class="center">2</td><td>Sửa thông tin tuyến xe</td></tr>
+    <tr><td class="center">3</td><td>Xóa tuyến xe</td></tr>
+    <tr><td class="center">4</td><td>Xem danh sách tuyến xe</td></tr>
+    <tr><td class="center">5</td><td rowspan="4">Quản lý điểm dừng</td><td>Thêm điểm dừng mới</td></tr>
+    <tr><td class="center">6</td><td>Sửa thông tin điểm dừng</td></tr>
+    <tr><td class="center">7</td><td>Xóa điểm dừng</td></tr>
+    <tr><td class="center">8</td><td>Xem danh sách điểm dừng</td></tr>
+    <tr><td class="center">9</td><td rowspan="5">Quản lý chuyến xe</td><td>Thêm chuyến xe mới</td></tr>
+    <tr><td class="center">10</td><td>Sửa thông tin chuyến xe</td></tr>
+    <tr><td class="center">11</td><td>Xóa chuyến xe</td></tr>
+    <tr><td class="center">12</td><td>Xem danh sách chuyến xe</td></tr>
+    <tr><td class="center">13</td><td>Lọc chuyến theo trạng thái</td></tr>
+    <tr><td class="center">14</td><td rowspan="4">Quản lý nhà xe</td><td>Thêm nhà xe mới</td></tr>
+    <tr><td class="center">15</td><td>Sửa thông tin nhà xe</td></tr>
+    <tr><td class="center">16</td><td>Xóa nhà xe</td></tr>
+    <tr><td class="center">17</td><td>Xem danh sách nhà xe</td></tr>
+    <tr><td class="center">18</td><td rowspan="4">Quản lý đặt vé</td><td>Xem danh sách đặt vé</td></tr>
+    <tr><td class="center">19</td><td>Xác nhận thanh toán khách hàng</td></tr>
+    <tr><td class="center">20</td><td>Phát hành vé PDF</td></tr>
+    <tr><td class="center">21</td><td>Xem chi tiết đặt vé</td></tr>
+    <tr><td class="center">22</td><td rowspan="2">Quản lý ghế</td><td>Xem sơ đồ ghế chuyến xe</td></tr>
+    <tr><td class="center">23</td><td>Quản lý trạng thái ghế</td></tr>
+    <tr><td class="center">24</td><td rowspan="4">Dashboard và Thống kê</td><td>Xem số liệu tổng quát (tổng doanh thu, giao dịch)</td></tr>
+    <tr><td class="center">25</td><td>Xem thống kê doanh thu theo thời gian</td></tr>
+    <tr><td class="center">26</td><td>Xem thống kê doanh thu theo nhà xe/tuyến đường</td></tr>
+    <tr><td class="center">27</td><td>Phân tích phương thức thanh toán</td></tr>
+    <tr><td class="center">28</td><td rowspan="2">Quản lý đánh giá</td><td>Xem danh sách chi tiết đánh giá chuyến đi</td></tr>
+    <tr><td class="center">29</td><td>Cập nhật trạng thái duyệt/ẩn đánh giá</td></tr>
+    <tr><td class="center">30</td><td rowspan="2">Nhật ký hệ thống (Logs)</td><td>Xem lịch sử truy cập đăng nhập</td></tr>
+    <tr><td class="center">31</td><td>Xem nhật ký thao tác và giao dịch hệ thống</td></tr>
+    <tr><td class="center">32</td><td rowspan="2">Quản lý tài khoản</td><td>Xem danh sách người dùng và nhân viên</td></tr>
+    <tr><td class="center">33</td><td>Tạo tài khoản nhân viên / Mở khóa, khóa tài khoản</td></tr>
+</table>
+
+<h2>III. Bảng Thống Kê Chức Năng</h2>
+<table>
+    <tr>
+        <th>Đối tượng</th>
+        <th>Số nhóm chức năng (F1)</th>
+        <th>Số chức năng chi tiết (F2)</th>
+    </tr>
+    <tr>
+        <td>Khách vãng lai (Guest)</td>
+        <td class="center">5</td>
+        <td class="center">14</td>
+    </tr>
+    <tr>
+        <td>Khách hàng (Customer)</td>
+        <td class="center">5</td>
+        <td class="center">18</td>
+    </tr>
+    <tr>
+        <td>Admin / Nhà xe</td>
+        <td class="center">10</td>
+        <td class="center">33</td>
+    </tr>
+    <tr>
+        <td class="bold">Tổng cộng</td>
+        <td class="center bold">20</td>
+        <td class="center bold">65</td>
+    </tr>
+</table>
+
+<br><br>
+<p style="text-align: center; font-style: italic;">
+    Tài liệu được tạo cho Đồ án tốt nghiệp - Hệ thống đặt vé xe khách trực tuyến<br>
+    (Đã cập nhật hệ thống đầy đủ các chức năng mới)
+</p>
+
+</body>
+</html>

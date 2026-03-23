@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thanh Toán - Đặt Vé Xe Khách</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/payment.css" />
+  <style>
+    /* Bổ sung một số style nhỏ cho trang checkout */
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+    }
+
+    .checkout-header {
+      text-align: center;
+      margin: 3rem 0;
+    }
+
+    .checkout-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--dark-color);
+    }
+
+    .checkout-header p {
+      color: var(--gray-medium);
+      font-size: 1.1rem;
+    }
+
+    .checkout-steps-modern {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-bottom: 3rem;
+    }
+
+    .step-item-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .step-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      color: var(--gray-light);
+      z-index: 1;
+      transition: var(--transition);
+    }
+
+    .step-item-header.active .step-dot {
+      background: var(--primary-color);
+      color: white;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+      transform: scale(1.1);
+    }
+
+    .step-item-header.completed .step-dot {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .step-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-medium);
+    }
+
+    .step-item-header.active .step-label {
+      color: var(--primary-color);
+    }
+
+    /* Alert styling */
+    .alert {
+      max-width: 1000px;
+      margin: 0 auto 2rem;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      font-weight: 600;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      color: var(--danger-color);
+      border: 1px solid #fee2e2;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      color: var(--success-color);
+      border: 1px solid #dcfce7;
+    }
+
+    /* Loading */
+    .loading-state {
+      text-align: center;
+      padding: 4rem;
+      color: var(--gray-medium);
+    }
+
+    .loading-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+
+      .btn-cancel-modern {
+        background: rgba(239, 68, 68, 0.05);
+        color: var(--danger-color);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        padding: 1.2rem;
+        width: 100%;
+        border-radius: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition-fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+      }
+
+    .btn-cancel-modern:hover {
+      background: var(--danger-color);
+      color: white;
+      border-color: var(--danger-color);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-confirm-modern {
+      width: 100%;
+      padding: 1.2rem;
+      background: rgba(99, 102, 241, 0.05);
+      color: var(--primary-color);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    .btn-confirm-modern:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-confirm-modern:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar (Reuse layout from style.css) -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <a href="index.html" class="logo">
+          <i class="fas fa-bus"></i>
+          <span>DatVeNhanh</span>
+        </a>
+        <ul class="nav-menu">
+          <li>
+            <a href="index.html"><i class="fas fa-home"></i> Trang Chủ</a>
+          </li>
+          <li>
+            <a href="ticket.html"><i class="fas fa-ticket-alt"></i> Vé Của Tôi</a>
+          </li>
+          <li>
+            <a href="login.html"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a>
+          </li>
+          <li>
+            <a href="register.html" class="btn-register"><i class="fas fa-user-plus"></i> Đăng Ký</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="checkout-header animate-fade-in">
+      <h1>Thanh Toán</h1>
+      <p>Vui lòng quét mã QR để thanh toán</p>
+    </div>
+
+    <!-- Progressive steps -->
+    <div class="checkout-steps-modern animate-fade-in-delay">
+      <div class="step-item-header completed">
+        <div class="step-dot"><i class="fas fa-check"></i></div>
+        <span class="step-label">Chọn chỗ</span>
+      </div>
+      <div class="step-item-header active">
+        <div class="step-dot">2</div>
+        <span class="step-label">Thanh toán</span>
+      </div>
+      <div class="step-item-header">
+        <div class="step-dot">3</div>
+        <span class="step-label">Nhận vé</span>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="errorMessage" class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span></span>
+    </div>
+    <div id="successMessage" class="alert alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span></span>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingMessage" class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Đang chuẩn bị thông tin thanh toán...</p>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div id="checkoutContent" class="payment-wrapper" style="display: none">
+      <!-- Section: Booking Details (Digital Ticket) -->
+      <div class="payment-card digital-ticket animate-slide-in-left">
+        <div class="ticket-header">
+          <h3>Thông Tin Đặt Vé</h3>
+        </div>
+
+        <div class="ticket-body">
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-route"></i> Tuyến:</span>
+            <span class="detail-value" id="routeName">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-building"></i> Nhà xe:</span>
+            <span class="detail-value" id="companyName">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-bus"></i> Loại xe:</span>
+            <span class="detail-value" id="busType">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-calendar-alt"></i> Khởi hành:</span>
+            <span class="detail-value" id="departureInfo">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Điểm đón:</span>
+            <span class="detail-value" id="fromStop">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-map-marker-alt"></i> Điểm trả:</span>
+            <span class="detail-value" id="toStop">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-chair"></i> Ghế ngồi:</span>
+            <span class="detail-value" id="seatCodes">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-user"></i> Hành khách:</span>
+            <span class="detail-value" id="customerName">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fas fa-phone"></i> Điện thoại:</span>
+            <span class="detail-value" id="customerPhone">-</span>
+          </div>
+        </div>
+
+        <div class="ticket-total">
+          <span class="total-label">Tổng cộng</span>
+          <span class="total-price" id="totalAmount">-</span>
+        </div>
+      </div>
+
+      <!-- Section: QR Hub -->
+      <div class="payment-card qr-payment-hub animate-slide-in-right">
+        <div class="hub-header">
+          <div class="timer-container" id="timerContainer">
+            <i class="fas fa-clock"></i>
+            <span>Giữ chỗ trong: <strong id="countdown">10:00</strong></span>
+          </div>
+          <h4>Quét mã QR để thanh toán</h4>
+        </div>
+
+        <div class="qr-frame">
+          <div id="qrLoading">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <p>Đang tạo mã...</p>
+          </div>
+          <img id="qrImage" class="qr-image-styled" src="" alt="QR Code" style="display: none" />
+        </div>
+
+        <div id="qrInfo" style="display: none">
+          <div class="copy-box">
+            <span class="copy-label">Nội dung chuyển khoản</span>
+            <div class="copy-content-row">
+              <span class="copy-text" id="qrContent">-</span>
+              <button class="btn-copy" onclick="copyContent()" title="Sao chép">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <p class="step-text">Mở ứng dụng ngân hàng hoặc ví điện tử (MoMo, ZaloPay...)</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <p class="step-text">Chọn chức năng quét mã QR và quét mã ở trên</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <p class="step-text">Kiểm tra thông tin số tiền & nội dung rồi nhấn chuyển tiền</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Section (Centered below) -->
+      <div id="checkoutActions" class="checkout-actions animate-fade-in-delay-2" style="display: none">
+        <button id="btnConfirmPayment" class="btn-confirm-modern" onclick="confirmPayment()">
+          <i class="fas fa-check-circle"></i>
+          Xác Nhận Đã Thanh Toán
+        </button>
+
+        <button id="btnCancel" class="btn-cancel-modern" onclick="cancelBooking()">
+          <i class="fas fa-times-circle"></i>
+          Hủy Đặt Vé
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/auth-nav.js"></script>
+  <script src="assets/js/checkout.js"></script>
+</body>
+
+</html>

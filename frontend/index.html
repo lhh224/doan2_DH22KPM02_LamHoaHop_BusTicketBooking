@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt Vé Xe Khách Online - Nhanh Chóng & An Toàn</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-content">
+          <div class="logo">
+            <i class="fas fa-bus"></i>
+            <span>DatVeNhanh</span>
+          </div>
+          <ul class="nav-menu">
+            <li>
+              <a href="index.html" class="active"
+                ><i class="fas fa-home"></i> Trang Chủ</a
+              >
+            </li>
+            <li>
+              <a href="trip-tracking.html"
+                ><i class="fas fa-map-marked-alt"></i> Theo Dõi</a
+              >
+            </li>
+            <li>
+              <a href="ticket.html"
+                ><i class="fas fa-ticket-alt"></i> Vé Của Tôi</a
+              >
+            </li>
+            <li>
+              <a href="login.html"
+                ><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a
+              >
+            </li>
+            <li>
+              <a href="register.html" class="btn-register"
+                ><i class="fas fa-user-plus"></i> Đăng Ký</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title animate-fade-in">
+            <i class="fas fa-bus-alt"></i>
+            Đặt Vé Xe Khách Trực Tuyến
+          </h1>
+          <p class="hero-subtitle animate-fade-in-delay">
+            Nhanh chóng • An toàn • Tiện lợi • Giá tốt nhất
+          </p>
+
+          <!-- Search Form -->
+          <div class="search-box animate-slide-up">
+            <form id="searchForm" class="search-form">
+              <div class="search-grid">
+                <div class="search-item">
+                  <label><i class="fas fa-map-marker-alt"></i> Điểm Đi</label>
+                  <select id="fromCity" required>
+                    <option value="">Chọn điểm đi</option>
+                  </select>
+                </div>
+
+                <div class="search-swap">
+                  <button type="button" id="swapBtn" class="swap-btn">
+                    <i class="fas fa-exchange-alt"></i>
+                  </button>
+                </div>
+
+                <div class="search-item">
+                  <label><i class="fas fa-map-marker-alt"></i> Điểm Đến</label>
+                  <select id="toCity" required>
+                    <option value="">Chọn điểm đến</option>
+                  </select>
+                </div>
+
+                <div class="search-item">
+                  <label><i class="fas fa-calendar-alt"></i> Ngày Đi</label>
+                  <input type="date" id="travelDate" required />
+                </div>
+
+                <div class="search-item">
+                  <button type="submit" class="btn btn-search">
+                    <i class="fas fa-search"></i>
+                    <span>Tìm chuyến</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Results (inline - hiển thị ngay trong trang chính) -->
+    <section id="searchResults" class="section-results" style="display: none">
+      <div class="container">
+        <!-- Thông tin tuyến đường -->
+        <div class="route-info-wrapper">
+          <div class="route-info">
+            <div>
+              <h1>
+                <span id="indexFromCity">Điểm đi</span>
+                <i class="fas fa-long-arrow-alt-right"></i>
+                <span id="indexToCity">Điểm đến</span>
+              </h1>
+              <p id="indexTripDate"></p>
+            </div>
+            <h2 class="results-count">
+              <span id="resultsCount">0</span> chuyến xe được tìm thấy
+            </h2>
+          </div>
+        </div>
+
+        <!-- Layout: Sidebar + Kết quả -->
+        <div class="search-layout">
+          <!-- Sidebar bộ lọc -->
+          <aside class="filter-sidebar">
+            <!-- Lọc header - LÊN ĐẦU TIÊN -->
+            <div class="filter-section">
+              <div class="filter-header">
+                <h3><i class="fas fa-filter"></i> Lọc</h3>
+                <button class="btn-clear" id="btnClearFilters">Xóa lọc</button>
+              </div>
+            </div>
+
+            <!-- Giờ đi -->
+            <div class="filter-section collapsible">
+              <div
+                class="filter-title"
+                onclick="this.parentElement.classList.toggle('collapsed')"
+              >
+                <h4><i class="fas fa-clock"></i> Giờ đi</h4>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="filter-content">
+                <label class="option"
+                  ><input type="checkbox" name="timeIndex" value="0-6" /> Sáng
+                  sớm (00-06h)</label
+                >
+                <label class="option"
+                  ><input type="checkbox" name="timeIndex" value="6-12" /> Buổi
+                  sáng (06-12h)</label
+                >
+                <label class="option"
+                  ><input type="checkbox" name="timeIndex" value="12-18" /> Buổi
+                  chiều (12-18h)</label
+                >
+                <label class="option"
+                  ><input type="checkbox" name="timeIndex" value="18-24" /> Buổi
+                  tối (18-24h)</label
+                >
+              </div>
+            </div>
+
+            <!-- Loại xe -->
+            <div class="filter-section collapsible">
+              <div
+                class="filter-title"
+                onclick="this.parentElement.classList.toggle('collapsed')"
+              >
+                <h4><i class="fas fa-bus"></i> Loại xe</h4>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="filter-content" id="busTypeFilter">
+                <!-- JS sẽ render danh sách loại xe -->
+              </div>
+            </div>
+
+            <!-- Nhà xe -->
+            <div class="filter-section collapsible">
+              <div
+                class="filter-title"
+                onclick="this.parentElement.classList.toggle('collapsed')"
+              >
+                <h4><i class="fas fa-building"></i> Nhà xe</h4>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="filter-content" id="companyFilterIndex">
+                <!-- JS sẽ render danh sách nhà xe -->
+              </div>
+            </div>
+
+            <!-- Khoảng giá -->
+            <div class="filter-section collapsible">
+              <div
+                class="filter-title"
+                onclick="this.parentElement.classList.toggle('collapsed')"
+              >
+                <h4><i class="fas fa-money-bill-wave"></i> Khoảng giá</h4>
+                <i class="fas fa-chevron-down"></i>
+              </div>
+              <div class="filter-content" id="priceFilterIndex">
+                <!-- JS sẽ render khoảng giá dựa trên dữ liệu thực từ DB -->
+              </div>
+            </div>
+
+            <!-- Sắp xếp - XUỐNG CUỐI -->
+            <div class="filter-section">
+              <h3><i class="fas fa-sort"></i> Sắp xếp</h3>
+              <div class="filter-content">
+                <label class="option"
+                  ><input
+                    type="radio"
+                    name="sortIndex"
+                    value="default"
+                    checked
+                  />
+                  Mặc định</label
+                >
+                <label class="option"
+                  ><input type="radio" name="sortIndex" value="early" /> Giờ đi
+                  sớm nhất</label
+                >
+                <label class="option"
+                  ><input type="radio" name="sortIndex" value="late" /> Giờ đi
+                  muộn nhất</label
+                >
+                <label class="option"
+                  ><input type="radio" name="sortIndex" value="price-asc" /> Giá
+                  tăng dần</label
+                >
+                <label class="option"
+                  ><input type="radio" name="sortIndex" value="price-desc" />
+                  Giá giảm dần</label
+                >
+              </div>
+            </div>
+          </aside>
+
+          <!-- Danh sách kết quả -->
+          <main class="results-main">
+            <div id="tripsList">
+              <!-- JS sẽ render danh sách chuyến xe -->
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popular Routes -->
+    <section class="popular-routes">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="fas fa-fire"></i>
+          Tuyến Đường Phổ Biến
+        </h2>
+
+        <!-- Routes Slider Container -->
+        <div class="routes-slider-container">
+          <!-- Nút Previous -->
+          <button class="routes-nav-btn routes-prev-btn" id="routesPrevBtn">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+
+          <!-- Routes Grid (Slider) -->
+          <div class="routes-slider-wrapper">
+            <div id="routesGrid" class="routes-grid">
+              <!-- Các thẻ tuyến đường sẽ được load từ database -->
+              <div class="routes-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Đang tải tuyến đường...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút Next -->
+          <button class="routes-nav-btn routes-next-btn" id="routesNextBtn">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Dots indicator -->
+        <div class="routes-dots" id="routesDots"></div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="fas fa-star"></i>
+          Tại Sao Chọn Chúng Tôi?
+        </h2>
+        <div class="features-grid">
+          <div class="feature-card fade-up-element">
+            <div class="feature-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3>Đặt Vé Nhanh Chóng</h3>
+            <p>Chỉ 3 bước đơn giản: Tìm chuyến → Chọn ghế → Thanh toán</p>
+          </div>
+
+          <div class="feature-card fade-up-element">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>An Toàn & Bảo Mật</h3>
+            <p>Thông tin được mã hóa, thanh toán an toàn 100%</p>
+          </div>
+
+          <div class="feature-card fade-up-element">
+            <div class="feature-icon">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <h3>Vé Điện Tử QR</h3>
+            <p>Nhận vé dưới dạng mã vạch ngay lập tức.</p>
+          </div>
+
+          <div class="feature-card fade-up-element">
+            <div class="feature-icon">
+              <i class="fas fa-couch"></i>
+            </div>
+            <h3>Chọn Ghế Linh Hoạt</h3>
+            <p>Xem sơ đồ ghế trực quan, đặt ghế theo chặng</p>
+          </div>
+
+          <div class="feature-card fade-up-element">
+            <div class="feature-icon">
+              <i class="fas fa-headset"></i>
+            </div>
+            <h3>Trợ Lý AI 24/7</h3>
+            <p>Chatbot thông minh hỗ trợ mọi lúc mọi nơi</p>
+          </div>
+
+          <div class="feature-card fade-up-element">
+            <div class="feature-icon">
+              <i class="fas fa-tags"></i>
+            </div>
+            <h3>Giá Tốt Nhất</h3>
+            <p>So sánh giá từ nhiều nhà xe, nhiều ưu đãi</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="howto-section">
+      <div class="container">
+        <h2 class="section-title">
+          <i class="fas fa-info-circle"></i>
+          Cách Đặt Vé Chỉ Với 3 Bước
+        </h2>
+        <div class="steps-container">
+          <div class="step-card fade-up-element">
+            <div class="step-number">1</div>
+            <div class="step-icon">
+              <i class="fas fa-search-location"></i>
+            </div>
+            <h3>Tìm Kiếm Chuyến Xe</h3>
+            <p>
+              Nhập điểm đi, điểm đến và ngày khởi hành. Hệ thống sẽ hiển thị các
+              chuyến xe phù hợp với nhiều lựa chọn giờ và loại xe.
+            </p>
+          </div>
+
+          <div class="step-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+
+          <div class="step-card fade-up-element">
+            <div class="step-number">2</div>
+            <div class="step-icon">
+              <i class="fas fa-chair"></i>
+            </div>
+            <h3>Chọn Ghế & Điền Thông Tin</h3>
+            <p>
+              Xem sơ đồ ghế trực quan, chọn vị trí yêu thích. Điền thông tin
+              khách hàng và chọn điểm đón/trả.
+            </p>
+          </div>
+
+          <div class="step-arrow">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+
+          <div class="step-card fade-up-element">
+            <div class="step-number">3</div>
+            <div class="step-icon">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <h3>Thanh Toán & Nhận Vé</h3>
+            <p>
+              Quét mã QR để thanh toán. Nhận vé ngay lập tức có mã vạch để lên
+              xe.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <h3><i class="fas fa-bus"></i> DatVeNhanh</h3>
+            <p>Hệ thống đặt vé xe khách trực tuyến nhanh chóng tại Việt Nam</p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h4>Về Chúng Tôi</h4>
+            <ul>
+              <li><a href="#">Giới thiệu</a></li>
+              <li><a href="#">Điều khoản sử dụng</a></li>
+              <li><a href="#">Chính sách bảo mật</a></li>
+              <li><a href="#">Câu hỏi thường gặp</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Hỗ Trợ</h4>
+            <ul>
+              <li><a href="#">Hướng dẫn đặt vé</a></li>
+              <li><a href="#">Hướng dẫn thanh toán</a></li>
+              <li><a href="#">Chính sách hủy vé</a></li>
+              <li><a href="#">Liên hệ hỗ trợ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Liên Hệ</h4>
+            <ul class="contact-info">
+              <li><i class="fas fa-phone"></i> Hotline: 1900-xxxx</li>
+              <li><i class="fas fa-envelope"></i> support@datvenhanh.vn</li>
+              <li><i class="fas fa-map-marker-alt"></i> TP. Hồ Chí Minh</li>
+              <li><i class="fas fa-clock"></i> 24/7</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 DatVeNhanh. Đồ án 2 - All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ===== CHATBOT ===== -->
+    <button
+      id="chatbotToggle"
+      class="chatbot-btn"
+      title="Trợ lý AI - Hỗ trợ 24/7"
+    >
+      <i class="fas fa-comments"></i>
+      <span class="chatbot-btn-badge">AI</span>
+    </button>
+
+    <div id="chatbotWidget" class="chatbot-widget" style="display: none">
+      <div class="chatbot-header">
+        <div class="chatbot-title">
+          <div class="chatbot-avatar-header">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="chatbot-title-text">
+            <span class="chatbot-name">Trợ Lý AI DatVeNhanh</span>
+            <span class="chatbot-status">
+              <span class="online-dot"></span> Đang hoạt động
+            </span>
+          </div>
+        </div>
+        <div class="chatbot-header-actions">
+          <button
+            id="chatbotClear"
+            class="chatbot-header-btn"
+            title="Xóa hội thoại"
+            onclick="clearChatHistory()"
+          >
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <button id="chatbotClose" class="chatbot-close" title="Đóng">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="chatbot-messages" id="chatMessages"></div>
+
+      <div class="chatbot-quick-actions" id="chatQuickActions">
+        <button class="quick-action-btn" data-msg="Hướng dẫn đặt vé chi tiết">
+          <i class="fas fa-ticket-alt"></i> Đặt vé
+        </button>
+        <button class="quick-action-btn" data-msg="Cách theo dõi hành trình xe">
+          <i class="fas fa-map-marked-alt"></i> Theo dõi
+        </button>
+        <button
+          class="quick-action-btn"
+          data-msg="Chính sách hủy vé và hoàn tiền"
+        >
+          <i class="fas fa-undo"></i> Hủy vé
+        </button>
+        <button
+          class="quick-action-btn"
+          data-msg="Các tuyến xe phổ biến và giá vé"
+        >
+          <i class="fas fa-route"></i> Tuyến xe
+        </button>
+        <button class="quick-action-btn" data-msg="Loại xe và tiện ích trên xe">
+          <i class="fas fa-bus"></i> Loại xe
+        </button>
+        <button class="quick-action-btn" data-msg="Liên hệ tổng đài hỗ trợ">
+          <i class="fas fa-headset"></i> Hỗ trợ
+        </button>
+      </div>
+
+      <div class="chatbot-input">
+        <form id="chatForm">
+          <textarea
+            id="chatInput"
+            placeholder="Nhập câu hỏi..."
+            rows="1"
+          ></textarea>
+          <button type="submit" id="chatSendBtn" title="Gửi tin nhắn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="assets/js/auth-nav.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

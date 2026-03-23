@@ -1,0 +1,90 @@
+{
+  "templateId": "sleeper-40",
+  "name": "Giường nằm 40 chỗ",
+  "busType": "Giường nằm",
+  "totalSeats": 40,
+  "description": "Xe giường nằm 40 chỗ, 2 tầng: dãy A+B tầng dưới (20 giường), dãy C+D tầng trên (20 giường)",
+  "layout": {
+    "type": "double-floor",
+    "orientation": "vertical",
+    "floors": [
+      {
+        "id": "floor-1",
+        "label": "Tầng dưới",
+        "sections": [
+          {
+            "id": "f1-main",
+            "type": "vertical-columns",
+            "structure": [
+              {
+                "column": "Trai",
+                "label": "Dãy trái",
+                "seats": ["A01", "A02", "A03", "A04", "A05"]
+              },
+              {
+                "column": "Giua",
+                "label": "Dãy giữa",
+                "seats": ["B01", "B02", "B03", "B04", "B05"]
+              },
+              {
+                "column": "Phai",
+                "label": "Dãy phải",
+                "seats": ["C01", "C02", "C03", "C04", "C05"]
+              }
+            ]
+          },
+          {
+            "id": "f1-last",
+            "type": "horizontal-row",
+            "label": "Hàng cuối",
+            "seats": ["D01", "D02", "D03", "D04", "D05"]
+          }
+        ]
+      },
+      {
+        "id": "floor-2",
+        "label": "Tầng trên",
+        "sections": [
+          {
+            "id": "f2-main",
+            "type": "vertical-columns",
+            "structure": [
+              {
+                "column": "Trai",
+                "label": "Dãy trái",
+                "seats": ["A06", "A07", "A08", "A09", "A10"]
+              },
+              {
+                "column": "Giua",
+                "label": "Dãy giữa",
+                "seats": ["B06", "B07", "B08", "B09", "B10"]
+              },
+              {
+                "column": "Phai",
+                "label": "Dãy phải",
+                "seats": ["C06", "C07", "C08", "C09", "C10"]
+              }
+            ]
+          },
+          {
+            "id": "f2-last",
+            "type": "horizontal-row",
+            "label": "Hàng cuối",
+            "seats": ["D06", "D07", "D08", "D09", "D10"]
+          }
+        ]
+      }
+    ]
+  },
+  "rendering": {
+    "seatWidth": "50px",
+    "seatHeight": "70px",
+    "gap": "10px",
+    "aisleWidth": "40px"
+  },
+  "metadata": {
+    "version": "1.1",
+    "createdDate": "2026-02-06",
+    "author": "System"
+  }
+}

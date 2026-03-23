@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Trị Hệ Thống - Bus Ticket Booking</title>
+  <link rel="stylesheet" href="assets/css/admin.css" />
+  <!-- Chart.js cho biểu đồ thống kê -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <div class="admin-layout">
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span class="logo-text">DatVeNhanh</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Thu gọn">
+          MENU
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#" class="nav-item active" data-section="dashboard">
+              <span class="nav-text">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="companies">
+              <span class="nav-text">Nhà Xe</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="routes">
+              <span class="nav-text">Tuyến Đường</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="stops">
+              <span class="nav-text">Điểm Dừng</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="trips">
+              <span class="nav-text">Chuyến Xe</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="statistics">
+              <span class="nav-text">Thống Kê</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="bookings">
+              <span class="nav-text">Đặt Vé</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="reviews">
+              <span class="nav-text">Đánh Giá</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="accounts" id="navAccounts" style="display: none">
+              <span class="nav-text">Tài Khoản</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="logs">
+              <span class="nav-text">Log</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <span class="admin-name" id="sidebarAdminName">Admin</span>
+        </div>
+        <a href="index.html" class="nav-item nav-home">
+          <span class="nav-text">Trang Chủ</span>
+        </a>
+        <button class="btn-logout" onclick="logout()">
+          <span class="nav-text">Đăng Xuất</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content" id="mainContent">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" id="mobileToggle">MENU</button>
+          <h2 class="page-title" id="pageTitle">Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+          <span class="admin-name-top" id="topAdminName">Admin</span>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area" id="contentArea">
+        <!-- Nội dung sẽ được render bằng JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- ========== MODAL CHUNG ========== -->
+  <div id="globalModal" class="modal">
+    <div class="modal-content" id="modalContent">
+      <div class="modal-header">
+        <h2 id="modalTitle">Tiêu đề</h2>
+        <button class="close" onclick="closeGlobalModal()">Đóng</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Nội dung modal sẽ được render bằng JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Box -->
+  <div id="alertBox" class="alert-box"></div>
+
+  <!-- Context Menu -->
+  <div id="contextMenu" class="context-menu">
+    <ul class="context-menu-items">
+      <!-- Items will be injected by JS -->
+    </ul>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/admin-panel.js"></script>
+  <script src="assets/js/admin-dashboard.js"></script>
+  <script src="assets/js/admin-statistics.js"></script>
+  <script src="assets/js/admin-accounts.js"></script>
+  <script src="assets/js/admin-logs.js"></script>
+  <script src="assets/js/admin-companies-panel.js"></script>
+  <script src="assets/js/admin-routes-panel.js"></script>
+  <script src="assets/js/admin-stops-panel.js"></script>
+  <script src="assets/js/admin-trips-panel.js"></script>
+  <script src="assets/js/admin-bookings-panel.js"></script>
+  <script src="assets/js/admin-reviews-panel.js"></script>
+</body>
+
+</html>
