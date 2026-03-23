@@ -1,408 +1,354 @@
-# 🚌 Hệ Thống Đặt Vé Xe Khách Trực Tuyến
+﻿# He Thong Dat Ve Xe Khach Truc Tuyen
 
-## 📋 Mô Tả Dự Án
+## Tong Quan
 
-Hệ thống đặt vé xe khách trực tuyến **HOÀN CHỈNH** tương tự Vexere.com, chạy demo local cho **đồ án tốt nghiệp**.
+Day la du an web dat ve xe khach full-stack chay local, gom frontend tinh gon bang HTML/CSS/JavaScript va backend REST API bang Node.js/Express ket noi SQL Server.
 
-### 🌟 Version 2.0 - PRODUCTION READY
+He thong ho tro cac nghiep vu chinh:
 
-Dự án sử dụng:
-
-- **Frontend**: HTML, CSS, JavaScript thuần (Modern UI với animations)
-- **Backend**: Node.js + Express + JWT Authentication
-- **Database**: SQL Server (16 tables với foreign keys & indexes)
-- **Security**: bcrypt password hashing, JWT tokens, SQL injection prevention
-- **Tính năng đặc biệt**:
-  - 🔐 Authentication & Authorization (JWT)
-  - 👤 User Dashboard với booking history
-  - 🎛️ Admin Dashboard với statistics & charts
-  - 📊 Reviews & Ratings system
-  - 🔔 Notifications system
-  - 💳 Coupon/Discount codes
-  - 🎫 Segment-based seat booking
-  - 💰 QR payment simulation
-  - 📄 PDF ticket generation
-  - 🤖 AI Chatbot (Google Gemini)
+- Tim kiem chuyen xe theo tuyen va ngay di
+- Chon ghe theo chang
+- Tao booking va xac nhan thanh toan QR gia lap
+- Theo doi hanh trinh xe theo thoi gian thuc (mo phong)
+- Quan ly nguoi dung va dashboard quan tri
+- Chatbot ho tro hoi dap
 
 ---
 
-## 🎯 Tính Năng Chính
+## Cong Nghe Su Dung
 
-### 🌐 Khách Vãng Lai (Guest)
-
-- ✅ Tìm kiếm chuyến xe theo điểm đi, điểm đến, ngày
-- ✅ Xem thông tin chi tiết chuyến xe
-- ✅ Xem sơ đồ ghế theo chặng
-
-### 👤 Khách Hàng (Customer)
-
-- ✅ **Đăng ký/Đăng nhập** tài khoản
-- ✅ Xem sơ đồ ghế theo chặng
-- ✅ Đặt ghế và khóa tạm thời (sp_LockSeats)
-- ✅ Áp dụng mã giảm giá
-- ✅ Thanh toán qua QR code (giả lập)
-- ✅ Tải vé PDF có mã QR vé
-- ✅ **Lịch sử đặt vé** với filter
-- ✅ **Hủy booking** (với điều kiện)
-- ✅ **Đánh giá chuyến đi** (rating 1-5 sao)
-- ✅ **Quản lý profile** (cập nhật thông tin)
-- ✅ **Thông báo** (booking, payment, system)
-
-### 🎛️ Admin
-
-- ✅ **Dashboard thống kê** (doanh thu, bookings, users, trips)
-- ✅ **Biểu đồ doanh thu** theo tháng
-- ✅ **Top tuyến xe** phổ biến
-- ✅ **Quản lý Users** (block/unblock, xem hoạt động)
-- ✅ **Quản lý Bookings** (xem tất cả, filter, search)
-- ✅ **Quản lý Nhà xe** (xem thống kê)
-- ✅ **Quản lý Tuyến đường** (xem số chuyến)
-- ✅ **Quản lý Chuyến xe** (filter theo nhà xe, tuyến, ngày)
-- ✅ **Duyệt Đánh giá** (approve/reject reviews)
-- ✅ Chatbot AI hỗ trợ 24/7 (tùy chọn)
+- Frontend: HTML, CSS, JavaScript thuan
+- Backend: Node.js, Express
+- Xac thuc: JWT + bcrypt
+- Database: SQL Server
+- Thu vien chinh: mssql, jsonwebtoken, cors, qrcode, @google/generative-ai
 
 ---
 
-## 📂 Cấu Trúc Thư Mục
+## Cau Truc Thu Muc
 
-```
-DatVeNhanhBooking/
+```text
+BusTicketBooking/
 ├─ frontend/
-│  ├─ index.html              # Trang chủ
-│  ├─ seat-map.html           # Sơ đồ ghế
-│  ├─ checkout.html           # Thanh toán
-│  ├─ ticket.html             # Xem vé
+│  ├─ index.html
+│  ├─ login.html
+│  ├─ register.html
+│  ├─ seat-map.html
+│  ├─ checkout.html
+│  ├─ ticket.html
+│  ├─ trip-tracking.html
+│  ├─ admin.html
 │  └─ assets/
-│     ├─ css/style.css        # CSS chung
+│     ├─ css/
 │     ├─ js/
 │     └─ img/
 │
-└─ backend/
-   ├─ server.js               # Server chính
-   ├─ package.json
-   ├─ .env                    # Biến môi trường
-   ├─ config/
-   │  ├─ env.js               # Đọc env
-   │  └─ db.js                # Kết nối SQL Server
-   ├─ routes/                 # Định nghĩa API routes
-   ├─ controllers/            # Xử lý request
-   ├─ services/               # Business logic
-   ├─ db/                     # SQL scripts
-   │  ├─ schema.sql           # Tạo database
-   │  ├─ seed.sql             # Dữ liệu mẫu
-   │  ├─ sp_LockSeats.sql     # SP khóa ghế
-   │  └─ sp_ConfirmPayment.sql# SP xác nhận thanh toán
-   ├─ libs/
-   │  ├─ pdf.js               # Sinh PDF
-   │  └─ qr.js                # Sinh QR code
-   ├─ utils/response.js       # Chuẩn hóa response
-   └─ generated_tickets/      # Lưu vé PDF
+├─ backend/
+│  ├─ server.js
+│  ├─ package.json
+│  ├─ config/
+│  │  ├─ env.js
+│  │  └─ db.js
+│  ├─ routes/
+│  ├─ controllers/
+│  ├─ services/
+│  ├─ middleware/
+│  ├─ libs/
+│  ├─ utils/
+│  └─ db/
+│     └─ db.sql
+│
+├─ README.md
+└─ HUONG_DAN_QUAN_LY_CHUYEN_XE.md
 ```
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt & Chạy
+## Tinh Nang Theo Vai Tro
 
-### Bước 1: Yêu Cầu Hệ Thống
+### Khach Vang Lai
 
-- **Node.js** v18+ ([Tải tại đây](https://nodejs.org/))
-- **SQL Server** Express/Developer ([Tải tại đây](https://www.microsoft.com/en-us/sql-server/sql-server-downloads))
-- **SSMS (SQL Server Management Studio)** ([Tải tại đây](https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms))
+- Tim kiem chuyen xe
+- Xem danh sach tuyen pho bien
+- Xem thong tin ghe trong theo chang
 
-### Bước 2: Cài Đặt Database
+### Nguoi Dung Da Dang Nhap
 
-1. Mở **SQL Server Management Studio (SSMS)**
-2. Kết nối đến SQL Server (localhost)
-3. Chạy tuần tự các file SQL:
-   ```
-   backend/db/schema.sql          # Tạo database và bảng
-   backend/db/seed.sql            # Thêm dữ liệu mẫu
-   backend/db/sp_LockSeats.sql    # Tạo stored procedure khóa ghế
-   backend/db/sp_ConfirmPayment.sql # Tạo stored procedure thanh toán
-   ```
+- Dang ky, dang nhap, doi mat khau
+- Dat cho, khoa ghe tam thoi, xac nhan thanh toan
+- Xem va huy booking theo dieu kien
+- Quan ly profile
+- Xem thong bao
+- Gui va quan ly danh gia
 
-### Bước 3: Cấu Hình Backend
+### Quan Tri Vien
 
-1. Mở terminal tại thư mục `backend/`
-2. Cài đặt dependencies:
-   ```bash
-   npm install
-   ```
-3. Tạo file `.env` (đã có sẵn, chỉnh sửa nếu cần):
-
-   ```env
-   PORT=3000
-   SQL_SERVER=localhost
-   SQL_DATABASE=BusBookingDemo
-   SQL_USER=sa
-   SQL_PASSWORD=YourStrong!Passw0rd
-   SQL_ENCRYPT=false
-   SQL_TRUST_SERVER_CERTIFICATE=true
-   GEMINI_API_KEY=your_gemini_key_here
-   GEMINI_MODEL=gemini-1.5-flash
-   ```
-
-   **Lưu ý**: Thay `SQL_PASSWORD` bằng mật khẩu SQL Server của bạn
-
-4. Chạy server:
-
-   ```bash
-   npm run dev
-   ```
-
-   Server sẽ chạy tại `http://localhost:3000`
-
-### Bước 4: Chạy Frontend
-
-**Cách 1: Sử dụng Live Server (Khuyến nghị)**
-
-1. Cài đặt **Live Server extension** trong VS Code
-2. Mở file `frontend/index.html`
-3. Click chuột phải → **Open with Live Server**
-4. Trang web sẽ mở tại `http://127.0.0.1:5500`
-
-**Cách 2: Mở trực tiếp**
-
-1. Double-click vào file `frontend/index.html`
-2. Trình duyệt sẽ mở file (lưu ý: một số tính năng có thể không hoạt động do CORS)
+- Dashboard thong ke doanh thu, booking, top tuyen
+- Quan ly nha xe, tuyen duong, diem dung, chuyen xe
+- Quan ly nguoi dung va danh gia
+- Xem log giao dich va log dang nhap
+- Tao tai khoan nhan vien
 
 ---
 
-## 📡 API Endpoints
+## Cai Dat Nhanh
 
-### Chuyến Xe (Trips)
+### 1. Yeu Cau Moi Truong
 
-```
-GET  /api/v1/trips/search?from=...&to=...&date=...  # Tìm chuyến
-GET  /api/v1/trips/:tripId                           # Chi tiết chuyến
-```
+- Node.js 18+
+- SQL Server (Express/Developer)
+- SQL Server Management Studio (SSMS)
 
-### Ghế (Seats)
+### 2. Khoi Tao Database
 
-```
-GET  /api/v1/seats?tripId=...&fromStopOrder=...&toStopOrder=...  # Sơ đồ ghế
-```
+1. Mo SSMS va ket noi SQL Server.
+2. Chay file sau:
 
-### Booking
-
-```
-POST /api/v1/bookings/lock              # Khóa ghế
-POST /api/v1/bookings/confirm           # Xác nhận thanh toán
-GET  /api/v1/bookings/:bookingId        # Thông tin booking
-POST /api/v1/bookings/:bookingId/cancel # Hủy booking
+```text
+backend/db/db.sql
 ```
 
-### Thanh Toán (Payments)
+### 3. Cai Dat Backend
 
-```
-POST /api/v1/payments/qr                # Tạo QR thanh toán
-```
+Di chuyen vao thu muc backend va cai dependencies:
 
-### Vé (Tickets)
-
-```
-POST /api/v1/tickets/issue                    # Phát hành vé PDF
-GET  /api/v1/tickets/download/:ticketCode     # Tải vé PDF
+```bash
+cd backend
+npm install
 ```
 
-### Chatbot
+Tao file .env trong thu muc backend:
 
+```env
+PORT=3000
+SQL_SERVER=localhost
+SQL_DATABASE=BusBookingDemo
+SQL_USER=sa
+SQL_PASSWORD=YourStrong!Passw0rd
+SQL_ENCRYPT=false
+SQL_TRUST_SERVER_CERTIFICATE=true
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-1.5-flash
 ```
-POST /api/v1/chat/ask                   # Gửi câu hỏi chatbot
+
+Chay server:
+
+```bash
+npm run dev
 ```
+
+Server mac dinh:
+
+```text
+http://localhost:3000
+```
+
+### 4. Truy Cap Frontend
+
+Backend dang phuc vu static frontend, ban co the vao truc tiep:
+
+- http://localhost:3000/
+- http://localhost:3000/login
+- http://localhost:3000/register
+- http://localhost:3000/seat-map
+- http://localhost:3000/checkout
+- http://localhost:3000/ticket
+- http://localhost:3000/trip-tracking
+- http://localhost:3000/admin
 
 ---
 
-## 🧪 Kiểm Tra Hệ Thống
+## Bien Moi Truong
 
-### 1. Kiểm tra Backend
+| Bien                         | Bat buoc | Mo ta                                   |
+| ---------------------------- | -------- | --------------------------------------- |
+| PORT                         | Khong    | Port chay backend, mac dinh 3000        |
+| SQL_SERVER                   | Co       | Host SQL Server                         |
+| SQL_DATABASE                 | Co       | Ten database                            |
+| SQL_USER                     | Co       | User SQL                                |
+| SQL_PASSWORD                 | Co       | Password SQL                            |
+| SQL_ENCRYPT                  | Khong    | Bat ma hoa ket noi SQL (true/false)     |
+| SQL_TRUST_SERVER_CERTIFICATE | Khong    | Cho phep tin chung chi self-signed      |
+| GEMINI_API_KEY               | Khong    | API key cho chatbot                     |
+| GEMINI_MODEL                 | Khong    | Model Gemini, mac dinh gemini-1.5-flash |
+
+---
+
+## API Endpoints Chi Tiet
+
+Base URL:
+
+```text
+http://localhost:3000/api/v1
+```
+
+### Auth
+
+- POST /auth/register
+- POST /auth/login
+- POST /auth/logout (can token)
+- GET /auth/me (can token)
+- PUT /auth/change-password (can token)
+
+### Users (can token)
+
+- GET /users/bookings
+- GET /users/bookings/:id
+- POST /users/bookings/:id/cancel
+- PUT /users/profile
+- GET /users/notifications
+- PUT /users/notifications/:id/read
+- GET /users/reviews
+- POST /users/reviews
+
+### Trips
+
+- GET /trips/cities
+- GET /trips/routes
+- GET /trips/active
+- GET /trips/search?from=...&to=...&date=...
+- GET /trips/:tripId
+
+### Seats
+
+- GET /seats?tripId=...&fromStopOrder=...&toStopOrder=...
+
+### Seat Templates
+
+- GET /seat-templates
+- GET /seat-templates/by-bus-type/:busType
+- GET /seat-templates/:templateId
+
+### Bookings
+
+- POST /bookings/lock
+- POST /bookings/confirm
+- GET /bookings/latest/:userId
+- GET /bookings/phone/:phone
+- GET /bookings/:bookingId
+- POST /bookings/:bookingId/cancel
+
+### Payments
+
+- POST /payments/qr
+
+### Tracking
+
+- GET /tracking/trip/:tripId
+- GET /tracking/trip/:tripId/stops
+- GET /tracking/trip/:tripId/position
+- GET /tracking/routes
+- GET /tracking/trips/active
+
+### Chat
+
+- POST /chat/ask
+
+### Admin (can token va quyen staff/admin)
+
+Staff tro len:
+
+- GET /admin/bookings
+- PUT /admin/bookings/:id/status
+- POST /admin/bookings/manual
+
+Admin:
+
+- GET /admin/dashboard/stats
+- GET /admin/dashboard/revenue-chart
+- GET /admin/dashboard/top-routes
+- GET /admin/dashboard/upcoming-trips
+- GET /admin/dashboard/fill-rate
+- GET /admin/dashboard/revenue-payments
+- GET /admin/dashboard/paid-bookings
+- CRUD nha xe: /admin/companies
+- CRUD tuyen: /admin/routes
+- CRUD diem dung: /admin/stops
+- CRUD chuyen xe: /admin/trips
+- GET /admin/bus-types
+- GET /admin/users
+- PUT /admin/users/:id/status
+- GET /admin/reviews
+- PUT /admin/reviews/:id/status
+- GET /admin/stats/revenue-by-time
+- GET /admin/stats/revenue-by-company
+- GET /admin/stats/revenue-by-route
+- GET /admin/stats/payment-methods
+- POST /admin/accounts/create-staff
+- PUT /admin/accounts/:id/toggle-lock
+- GET /admin/logs/transactions
+- GET /admin/logs/logins
+
+---
+
+## Kiem Tra Nhanh
+
+### Kiem tra server
 
 ```bash
 curl http://localhost:3000/health
 ```
 
-Kết quả mong đợi:
-
-```json
-{
-  "success": true,
-  "message": "Server đang hoạt động",
-  "timestamp": "..."
-}
-```
-
-### 2. Kiểm tra Tìm Chuyến
+### Kiem tra tim chuyen
 
 ```bash
-curl "http://localhost:3000/api/v1/trips/search?from=Hồ Chí Minh&to=Đà Lạt&date=2025-10-20"
+curl "http://localhost:3000/api/v1/trips/search?from=Ho%20Chi%20Minh&to=Da%20Lat&date=2026-03-24"
 ```
 
-### 3. Kiểm tra Database
-
-Mở SSMS và chạy:
+### Kiem tra database
 
 ```sql
 USE BusBookingDemo;
 SELECT COUNT(*) AS TotalTrips FROM Trips;
-SELECT COUNT(*) AS TotalSeats FROM Seats;
+SELECT COUNT(*) AS TotalBookings FROM Bookings;
+SELECT COUNT(*) AS TotalUsers FROM Users;
 ```
 
 ---
 
-## 🎨 Demo Flow
+## Luong Nghiep Vu De Xuat
 
-### Quy Trình Đặt Vé Hoàn Chỉnh:
-
-1. **Tìm Chuyến** (`index.html`)
-
-   - Nhập điểm đi: **Hồ Chí Minh**
-   - Nhập điểm đến: **Đà Lạt**
-   - Chọn ngày: **20/10/2025**
-   - Click **Tìm Chuyến**
-   - ✅ Kết quả: Hiển thị 4 chuyến xe khả dụng
-
-2. **Chọn Ghế** (`seat-map.html`)
-
-   - Click **"Xem sơ đồ ghế"** ở chuyến muốn đặt
-   - Chọn điểm đón và điểm trả
-   - Xem sơ đồ ghế (trắng = trống, xám = đã đặt)
-   - Click chọn ghế (VD: A01, A02) → ghế chuyển màu xanh
-   - Nhập thông tin: **Họ tên**, **Số điện thoại**
-   - Click **"Đặt Vé Ngay"**
-   - ✅ Kết quả: Ghế được khóa trong 10 phút
-
-3. **Thanh Toán** (`checkout.html`)
-
-   - Xem thông tin booking (chuyến, ghế, giá tiền)
-   - Hiển thị **QR code thanh toán** (giả lập)
-   - Click **"Xác Nhận Đã Thanh Toán"**
-   - ✅ Kết quả: Booking chuyển trạng thái PAID
-
-4. **Nhận Vé** (`ticket.html`)
-   - Hiển thị **vé điện tử** với mã QR vé
-   - Click **"Tải Vé PDF"** để download file PDF
-   - ✅ Kết quả: File PDF được lưu vào máy
+1. Dang ky hoac dang nhap.
+2. Tim chuyen tren trang chu.
+3. Chon chuyen va chon ghe theo chang.
+4. Tao booking lock ghe.
+5. Tao QR thanh toan va xac nhan.
+6. Xem trang ticket.
+7. Theo doi chuyen o trang tracking.
 
 ---
 
-## 🤖 Cấu Hình Chatbot AI (Tùy Chọn)
+## Troubleshooting
 
-Chatbot AI sử dụng Google Gemini API. Để kích hoạt:
+### Khong ket noi duoc SQL Server
 
-1. **Lấy API Key** từ [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. **Cập nhật file** `backend/.env`:
-   ```env
-   GEMINI_API_KEY=your_actual_api_key_here
-   GEMINI_MODEL=gemini-1.5-flash
-   ```
-3. **Khởi động lại server**:
-   ```bash
-   cd backend
-   npm run dev
-   ```
-4. **Test chatbot** bằng cách click vào biểu tượng chat ở góc dưới phải trang web
+- Kiem tra SQL Server service dang chay
+- Kiem tra host, user, password trong .env
+- Kiem tra port SQL (thuong la 1433)
+- Thu ket noi bang SSMS truoc
 
-**Lưu ý:** Nếu không có API key, chatbot sẽ trả về thông báo lỗi nhưng các tính năng khác vẫn hoạt động bình thường.
+### Loi CORS khi mo file frontend truc tiep
 
----
+- Nen truy cap qua http://localhost:3000 thay vi mo file html truc tiep
+- Dam bao backend dang chay
 
----
+### Loi 401 hoac 403 o API bao mat
 
-## 📝 Ghi Chú Quan Trọng
+- Kiem tra Authorization header dang dung Bearer token
+- Kiem tra token con han
+- Kiem tra role nguoi dung (admin/staff)
 
-### Tính năng kỹ thuật nổi bật:
+### Chatbot khong phan hoi
 
-- 🔒 **Stored Procedure `sp_LockSeats`**: Sử dụng SERIALIZABLE isolation level để tránh race condition khi nhiều người đặt cùng lúc
-- 🎫 **Quản lý ghế theo chặng giữa**: Ghế có thể được đặt cho các chặng khác nhau không chồng lấn (segment-based booking)
-- ⚡ **Concurrency Control**: Xử lý xung đột khi nhiều request đồng thời
-- 📊 **Transaction Management**: Đảm bảo tính toàn vẹn dữ liệu
-
-### Giới hạn của demo:
-
-- 💳 **Thanh toán QR**: Chỉ là giả lập cho mục đích demo, không tích hợp cổng thanh toán thực
-- � **Authentication**: Chưa có hệ thống đăng nhập/đăng ký
-- �📄 **Vé PDF**: Được lưu tại `backend/generated_tickets/` (cần tạo thư mục nếu chưa có)
+- Kiem tra GEMINI_API_KEY trong .env
+- Kiem tra ket noi internet
+- Kiem tra log backend de xem loi tra ve tu model
 
 ---
 
-## � Troubleshooting (Chi tiết)
+## Thong Tin Du An
 
-### Backend không kết nối được SQL Server
-
-**Triệu chứng:**
-
-```
-ConnectionError: Failed to connect to localhost:1433
-```
-
-**Giải pháp:**
-
-1. Kiểm tra SQL Server đã chạy: Mở **SQL Server Configuration Manager**
-2. Kiểm tra SQL Server Browser service đã bật
-3. Kiểm tra firewall cho phép port 1433
-4. Kiểm tra thông tin đăng nhập trong file `.env`
-5. Thử kết nối bằng SSMS trước để đảm bảo credentials đúng
-
-### Stored Procedure không tìm thấy
-
-**Triệu chứng:**
-
-```
-RequestError: Could not find stored procedure 'sp_LockSeats'
-```
-
-**Giải pháp:**
-
-```bash
-# Chạy lại script tạo stored procedures
-cd backend
-node create-stored-procedures.js
-```
-
-Hoặc chạy thủ công trong SSMS:
-
-- `backend/db/sp_LockSeats.sql`
-- `backend/db/sp_ConfirmPayment.sql`
-
-### Frontend không gọi được API (CORS error)
-
-**Triệu chứng:**
-
-```
-Access to fetch has been blocked by CORS policy
-```
-
-**Giải pháp:**
-
-- Đảm bảo backend đang chạy tại `http://localhost:3000`
-- Kiểm tra middleware CORS trong `server.js` đã được bật
-- Sử dụng Live Server thay vì mở file HTML trực tiếp
-
-### Database không có dữ liệu
-
-**Giải pháp:**
-
-```bash
-# Chạy lại seed data
-cd backend
-node insert-seed-data.js
-```
-
----
-
-## 👨‍💻 Thông Tin Dự Án
-
-**Loại**: Đồ án tốt nghiệp  
-**Chủ đề**: Hệ thống đặt vé xe khách trực tuyến  
-**Công nghệ**: Node.js + Express + SQL Server + HTML/CSS/JavaScript  
-**Năm**: 2025
-
----
-
-## 📜 License
-
-MIT License - Sử dụng tự do cho mục đích học tập
-
----
-
-**🎉 Chúc bạn demo thành công!**
+- Loai: Do an tot nghiep
+- Linh vuc: Dat ve xe khach truc tuyen
+- Nam: 2025
+- Nhom cong nghe: Node.js, Express, SQL Server, HTML, CSS, JavaScript

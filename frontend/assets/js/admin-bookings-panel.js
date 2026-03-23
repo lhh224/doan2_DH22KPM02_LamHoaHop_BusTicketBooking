@@ -14,18 +14,18 @@ async function renderBookingsSection() {
 
   contentArea.innerHTML = `
     <div class="toolbar">
-      <div class="toolbar-left">
+      <div class="toolbar-left" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
         <input type="text" class="search-input" id="bookingSearchInput"
           placeholder="Tìm theo tên, SĐT, email..."
-          oninput="filterBookingsPanel()" />
-        <select class="filter-select" id="bookingStatusFilter" onchange="filterBookingsPanel()">
+          oninput="filterBookingsPanel()" style="max-width: 300px;" />
+        <select class="filter-select" id="bookingStatusFilter" onchange="filterBookingsPanel()" style="max-width: 200px;">
           <option value="">Tất cả trạng thái</option>
           <option value="PENDING">Chờ thanh toán</option>
           <option value="PAID">Đã thanh toán</option>
           <option value="CANCELLED">Đã hủy</option>
         </select>
         <div class="toolbar-info" id="bookingsPanelInfo"
-          style="margin-left:16px;font-weight:500;color:var(--text-secondary);">Đang tải...</div>
+          style="display: flex; gap: 8px; align-items: center;">Đang tải...</div>
       </div>
       <div class="toolbar-right">
         <button class="btn btn-primary" onclick="openCreateBookingModal()">+ Tạo vé mới</button>
@@ -110,7 +110,8 @@ function renderBookingsPanelTable(data) {
         </td>
         <td>
           <div style="font-weight:600">${b.RouteName || "-"}</div>
-          <div style="font-size:12px;color:#888">${b.DepartureCity || ""} → ${b.ArrivalCity || ""} | ${formatDate(b.DepartureDate)}</div>
+          <div style="font-size:12px;color:#888">${b.DepartureCity || ""} → ${b.ArrivalCity || ""}</div>
+          <div style="font-size:12px;color:#888">${formatDate(b.DepartureDate)}</div>
         </td>
         <td><span style="font-family:monospace">${b.SeatList || "-"}</span></td>
         <td><strong style="color:#4CAF50">${formatPrice(b.TotalAmount)}</strong></td>
@@ -127,7 +128,12 @@ function renderBookingsPanelTable(data) {
   // Đếm theo trạng thái
   const paid = data.filter((b) => b.Status === "PAID").length;
   const pending = data.filter((b) => b.Status === "PENDING").length;
-  info.textContent = `Tổng: ${data.length} | Đã TT: ${paid} | Chờ: ${pending}`;
+
+  info.innerHTML = `
+    <span style="color: #000; font-weight: 600;">Tổng: ${data.length}</span>
+    <span style="color: #000; font-weight: 500; margin-left: 16px;">Đã thanh toán: ${paid}</span>
+    <span style="color: #000; font-weight: 500; margin-left: 16px;">Chờ thanh toán: ${pending}</span>
+  `;
 }
 
 /**
@@ -183,8 +189,7 @@ function showBookingDetail(bookingId) {
       <tr><td style="padding:10px 0;color:#888">Trạng Thái</td><td style="padding:10px 0">${statusMap[b.Status] || b.Status}</td></tr>
     </table>
     <div class="form-actions" style="margin-top:16px">
-      <button class="btn btn-secondary" onclick="closeGlobalModal()">Đóng</button>
-      ${b.Status === "PENDING" ? `<button class="btn btn-success" onclick="closeGlobalModal(); confirmBookingPayment(${b.BookingId})">✓ Xác Nhận Thanh Toán</button>` : ""}
+      ${b.Status === "PENDING" ? `<button class="btn btn-primary" onclick="closeGlobalModal(); confirmBookingPayment(${b.BookingId})">Xác Nhận Thanh Toán</button>` : ""}
       ${b.Status === "PENDING" ? `<button class="btn btn-danger" onclick="closeGlobalModal(); cancelBooking(${b.BookingId})">Hủy Đặt Vé</button>` : ""}
     </div>
   `;
@@ -237,8 +242,10 @@ async function openCreateBookingModal() {
     const tripOptions = trips
       .filter((t) => t.IsActive !== false)
       .map((t) => {
-        const label = `${t.TripId} | ${t.RouteName || "-"} | ${formatDate(t.DepartureDate)} ${t.DepartureTime || ""} | ${formatPrice(t.Price)}`;
-        return `<option value="${t.TripId}">${label}</option>`;
+        const route = (t.RouteName || "-").padEnd(35, " ");
+        const dateTime = `${formatDate(t.DepartureDate)} ${t.DepartureTime || ""}`;
+        const label = `${route}  ${dateTime}`;
+        return `<option value="${t.TripId}">${label.replace(/ /g, "\u00A0")}</option>`;
       })
       .join("");
 
@@ -247,7 +254,7 @@ async function openCreateBookingModal() {
         <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div class="form-group" style="grid-column:1 / -1">
             <label>Chuyến xe</label>
-            <select id="manualTripId" required>
+            <select id="manualTripId" required style="font-family: monospace;" onchange="onManualTripChange()">
               <option value="">-- Chọn chuyến xe --</option>
               ${tripOptions}
             </select>
@@ -266,15 +273,23 @@ async function openCreateBookingModal() {
           </div>
           <div class="form-group" style="grid-column:1 / -1">
             <label>Ghế (cách nhau dấu phẩy)</label>
-            <input type="text" id="manualSeatCodes" required placeholder="A01, A02" />
+            <input type="text" id="manualSeatCodes" required placeholder="A01, A02" oninput="updateManualBookingPrice()" />
+          </div>
+          <div class="form-group" style="grid-column:1 / -1">
+            <label>Tổng tiền</label>
+            <div id="manualTotalPrice" style="font-weight:700; color:var(--success); font-size:18px;">0 ₫</div>
           </div>
           <div class="form-group">
-            <label>Điểm đón (thứ tự)</label>
-            <input type="number" id="manualFromStopOrder" min="1" value="1" required />
+            <label>Điểm đón</label>
+            <select id="manualFromStopOrder" required>
+              <option value="">-- Chọn điểm đón --</option>
+            </select>
           </div>
           <div class="form-group">
-            <label>Điểm trả (thứ tự)</label>
-            <input type="number" id="manualToStopOrder" min="2" value="2" required />
+            <label>Điểm trả</label>
+            <select id="manualToStopOrder" required>
+              <option value="">-- Chọn điểm trả --</option>
+            </select>
           </div>
           <div class="form-group" style="grid-column:1 / -1">
             <label>Phương thức thanh toán</label>
@@ -287,15 +302,87 @@ async function openCreateBookingModal() {
         </div>
         <div class="form-actions" style="margin-top:16px;display:flex;justify-content:flex-end;gap:10px;">
           <button type="button" class="btn btn-secondary" onclick="closeGlobalModal()">Hủy</button>
-          <button type="submit" class="btn btn-success">Tạo vé</button>
+          <button type="submit" class="btn btn-primary">Tạo vé</button>
         </div>
       </form>
     `;
 
     openGlobalModal("Tạo vé mới", html);
+
+    // Lưu trips vào window để dùng cho hàm tính tiền và load stops
+    window._manualBookingTrips = trips;
   } catch (e) {
     showAlert(e.message || "Không thể mở form tạo vé", "error");
   }
+}
+
+/**
+ * Khi thay đổi chuyến xe: Cập nhật giá và Load danh sách điểm dừng
+ */
+async function onManualTripChange() {
+  updateManualBookingPrice();
+  const tripId = parseInt(document.getElementById("manualTripId").value, 10);
+  const fromSelect = document.getElementById("manualFromStopOrder");
+  const toSelect = document.getElementById("manualToStopOrder");
+
+  if (!tripId || !fromSelect || !toSelect) return;
+
+  const trip = (window._manualBookingTrips || []).find((t) => t.TripId === tripId);
+  if (!trip || !trip.RouteId) return;
+
+  try {
+    fromSelect.innerHTML = '<option value="">Đang tải...</option>';
+    toSelect.innerHTML = '<option value="">Đang tải...</option>';
+
+    const res = await adminFetch(`/admin/stops?routeId=${trip.RouteId}`);
+    const stops = res.data.stops || [];
+
+    let fromHtml = '<option value="">-- Chọn điểm đón --</option>';
+    let toHtml = '<option value="">-- Chọn điểm trả --</option>';
+
+    stops.forEach((s) => {
+      const label = `${s.StopOrder}. ${s.StopName}`;
+      fromHtml += `<option value="${s.StopOrder}">${label}</option>`;
+      toHtml += `<option value="${s.StopOrder}">${label}</option>`;
+    });
+
+    fromSelect.innerHTML = fromHtml;
+    toSelect.innerHTML = toHtml;
+
+    // Default chọn điểm đầu và điểm cuối
+    if (stops.length >= 2) {
+      fromSelect.value = stops[0].StopOrder;
+      toSelect.value = stops[stops.length - 1].StopOrder;
+    }
+  } catch (e) {
+    console.error("Lỗi load stops cho manual booking:", e);
+    fromSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+    toSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+  }
+}
+
+/**
+ * Cập nhật giá vé dự kiến khi user chọn chuyến hoặc nhập ghế
+ */
+function updateManualBookingPrice() {
+  const tripId = parseInt(document.getElementById("manualTripId").value, 10);
+  const seatCodes = document.getElementById("manualSeatCodes").value.trim();
+  const priceEl = document.getElementById("manualTotalPrice");
+  if (!priceEl) return;
+
+  if (!tripId || !seatCodes) {
+    priceEl.textContent = "0 ₫";
+    return;
+  }
+
+  const trip = (window._manualBookingTrips || []).find((t) => t.TripId === tripId);
+  if (!trip) {
+    priceEl.textContent = "0 ₫";
+    return;
+  }
+
+  const numSeats = seatCodes.split(",").filter((s) => s.trim()).length;
+  priceEl.textContent = formatPrice(trip.Price * numSeats);
 }
 
 /**

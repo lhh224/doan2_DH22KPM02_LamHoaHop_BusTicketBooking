@@ -178,8 +178,8 @@ const getTripsAdmin = async (filters = {}) => {
       t.CompanyId,
       t.BusTypeId,
       t.DepartureDate,
-      t.DepartureTime,
-      t.ArrivalTime,
+      CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+      CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
       t.Price,
       t.IsActive,
       t.CreatedAt,
@@ -249,7 +249,7 @@ const getAllBookings = async (filters = {}) => {
       b.Status,
       b.BookingDate,
       t.DepartureDate,
-      t.DepartureTime,
+      CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
       r.RouteName,
       r.DepartureCity,
       r.ArrivalCity,
@@ -664,7 +664,7 @@ const getUpcomingTrips = async () => {
   const pool = await getPool();
   const result = await pool.query(`
     SELECT TOP 10
-      t.TripId, t.DepartureTime, t.ArrivalTime, t.DepartureDate, t.Price,
+      t.TripId, CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime, CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime, t.DepartureDate, t.Price,
       r.RouteName, r.DepartureCity, r.ArrivalCity,
       c.CompanyName,
       bt.BusTypeName, bt.TotalSeats,
@@ -1066,12 +1066,12 @@ const getTransactionLogs = async (filters = {}) => {
 
   let query = `
     SELECT 
-      tr.TransactionId, tr.BookingId, tr.Amount, tr.PaymentMethod,
-      tr.Status, tr.ExternalTransactionId, tr.Note, tr.CreatedAt,
+      p.PaymentId, p.BookingId, p.Amount, p.PaymentMethod,
+      p.Status, p.ExternalTransactionId, p.Note, p.CreatedAt,
       b.CustomerName, b.CustomerPhone, b.TicketCode,
       r.RouteName
-    FROM Transactions tr
-    INNER JOIN Bookings b ON tr.BookingId = b.BookingId
+    FROM Payments p
+    INNER JOIN Bookings b ON p.BookingId = b.BookingId
     INNER JOIN Trips t ON b.TripId = t.TripId
     INNER JOIN Routes r ON t.RouteId = r.RouteId
     WHERE 1=1
@@ -1080,19 +1080,19 @@ const getTransactionLogs = async (filters = {}) => {
   const request = pool.request();
 
   if (filters.fromDate) {
-    query += " AND CAST(tr.CreatedAt AS DATE) >= @FromDate";
+    query += " AND CAST(p.CreatedAt AS DATE) >= @FromDate";
     request.input("FromDate", sql.Date, filters.fromDate);
   }
   if (filters.toDate) {
-    query += " AND CAST(tr.CreatedAt AS DATE) <= @ToDate";
+    query += " AND CAST(p.CreatedAt AS DATE) <= @ToDate";
     request.input("ToDate", sql.Date, filters.toDate);
   }
   if (filters.status) {
-    query += " AND tr.Status = @Status";
+    query += " AND p.Status = @Status";
     request.input("Status", sql.VarChar, filters.status);
   }
 
-  query += " ORDER BY tr.CreatedAt DESC";
+  query += " ORDER BY p.CreatedAt DESC";
 
   const result = await request.query(query);
   return result.recordset;

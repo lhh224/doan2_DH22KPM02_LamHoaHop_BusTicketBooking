@@ -344,6 +344,24 @@ const ContextMenu = {
             danger: isActive,
           },
         ];
+      case "booking":
+        const isPending = data.Status === "PENDING";
+        const bookingItems = [
+          { label: "Xem chi tiết", action: `showBookingDetail(${data.BookingId})` }
+        ];
+        if (isPending) {
+          bookingItems.push({ separator: true });
+          bookingItems.push({
+            label: "Xác nhận thanh toán",
+            action: `confirmBookingPayment(${data.BookingId})`,
+          });
+          bookingItems.push({
+            label: "Hủy đặt vé",
+            action: `cancelBooking(${data.BookingId})`,
+            danger: true,
+          });
+        }
+        return bookingItems;
       default:
         return [];
     }

@@ -16,12 +16,11 @@ async function renderStopsSection() {
 
   contentArea.innerHTML = `
     <div class="toolbar">
-      <div class="toolbar-left">
-        <select id="stopsRouteFilter" class="search-input" style="min-width:280px" onchange="onStopRouteChange()">
+      <div class="toolbar-left" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <select id="stopsRouteFilter" class="search-input" style="max-width: 350px" onchange="onStopRouteChange()">
           <option value="">-- Chọn tuyến đường --</option>
         </select>
-        <input type="text" class="search-input" id="stopSearchInput" placeholder="Tìm điểm dừng..." oninput="filterStopsPanel()" style="margin-left:8px" />
-        <div class="toolbar-info" id="stopsPanelInfo" style="margin-left: 16px; font-weight: 500; color: var(--text-secondary);">Chọn tuyến đường</div>
+        <input type="text" class="search-input" id="stopSearchInput" placeholder="Tìm điểm dừng..." oninput="filterStopsPanel()" style="max-width: 350px" />
       </div>
       <div class="toolbar-right">
         <button class="btn btn-primary" id="btnAddStop" onclick="openAddStopModal()" disabled>Thêm Điểm Dừng</button>

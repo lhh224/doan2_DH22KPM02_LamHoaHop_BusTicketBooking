@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           // Cập nhật URL mà không reload trang (optional, but cleaner)
           window.history.replaceState(null, "", `?bookingId=${bookingId}`);
         } else {
-          showError("Bạn chưa có vé nào. Vui lòng quay lại trang chủ.");
+          showError("Bạn chưa có vé nào. Vui lòng đặt vé!");
           return;
         }
       } catch (err) {
@@ -216,7 +216,7 @@ function displayTicketInfo() {
  */
 function showError(message) {
   const errorDiv = document.getElementById("errorMessage");
-  errorDiv.textContent = "❌ " + message;
+  errorDiv.textContent = message;
   errorDiv.style.display = "block";
   document.getElementById("loadingMessage").style.display = "none";
   window.scrollTo(0, 0);

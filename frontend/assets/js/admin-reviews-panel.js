@@ -14,8 +14,8 @@ async function renderReviewsSection() {
 
   contentArea.innerHTML = `
     <div class="toolbar">
-      <div class="toolbar-left">
-        <select class="filter-select" id="reviewStatusFilter" onchange="filterReviewsPanel()">
+      <div class="toolbar-left" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <select class="filter-select" id="reviewStatusFilter" onchange="filterReviewsPanel()" style="max-width: 180px;">
           <option value="">Tất cả trạng thái</option>
           <option value="PENDING">Chờ duyệt</option>
           <option value="APPROVED">Đã duyệt</option>
@@ -23,9 +23,9 @@ async function renderReviewsSection() {
         </select>
         <input type="text" class="search-input" id="reviewSearchInput"
           placeholder="Tìm theo nhà xe, tuyến đường..."
-          oninput="filterReviewsPanel()" />
+          oninput="filterReviewsPanel()" style="max-width: 300px;" />
         <div class="toolbar-info" id="reviewsPanelInfo"
-          style="margin-left:16px;font-weight:500;color:var(--text-secondary);">Đang tải...</div>
+          style="display: flex; gap: 8px; align-items: center;">Đang tải...</div>
       </div>
     </div>
 
@@ -129,7 +129,12 @@ function renderReviewsPanelTable(data) {
 
   const pending = data.filter((r) => r.Status === "PENDING").length;
   const approved = data.filter((r) => r.Status === "APPROVED").length;
-  info.textContent = `Tổng: ${data.length} | Chờ duyệt: ${pending} | Đã duyệt: ${approved}`;
+
+  info.innerHTML = `
+    <span style="color: #000; font-weight: 600;">Tổng: ${data.length}</span>
+    <span style="color: #000; font-weight: 500; margin-left: 16px;">Chờ duyệt: ${pending}</span>
+    <span style="color: #000; font-weight: 500; margin-left: 16px;">Đã duyệt: ${approved}</span>
+  `;
 }
 
 /**

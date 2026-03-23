@@ -33,8 +33,8 @@ const getTripTrackingData = async (tripId) => {
     const result = await pool.request().input("tripId", sql.Int, tripId).query(`
         SELECT 
           t.TripId,
-          t.DepartureTime,
-          t.ArrivalTime,
+          CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+          CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
           t.DepartureDate,
           t.Price as BasePrice,
           r.RouteId,
@@ -78,7 +78,7 @@ const getTripStopsWithStatus = async (tripId) => {
       .request()
       .input("tripId", sql.Int, tripId)
       .query(
-        "SELECT RouteId, DepartureTime, ArrivalTime, DepartureDate FROM Trips WHERE TripId = @tripId",
+        "SELECT RouteId, CONVERT(VARCHAR(5), DepartureTime, 108) AS DepartureTime, CONVERT(VARCHAR(5), ArrivalTime, 108) AS ArrivalTime, DepartureDate FROM Trips WHERE TripId = @tripId",
       );
 
     if (tripResult.recordset.length === 0) {
@@ -127,8 +127,8 @@ const getSimulatedPosition = async (tripId) => {
           r.DepartureCity as FromCity,
           r.ArrivalCity as ToCity,
           r.Distance,
-          t.DepartureTime,
-          t.ArrivalTime
+          CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+          CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime
         FROM Trips t
         INNER JOIN Routes r ON t.RouteId = r.RouteId
         WHERE t.TripId = @tripId
@@ -253,8 +253,8 @@ const getActiveTrips = async () => {
     const result = await pool.request().query(`
       SELECT 
         t.TripId as tripId,
-        t.DepartureTime as departureTime,
-        t.ArrivalTime as arrivalTime,
+        CONVERT(VARCHAR(5), t.DepartureTime, 108) as departureTime,
+        CONVERT(VARCHAR(5), t.ArrivalTime, 108) as arrivalTime,
         t.DepartureDate as departureDate,
         r.RouteName as routeName,
         r.DepartureCity as fromCity,

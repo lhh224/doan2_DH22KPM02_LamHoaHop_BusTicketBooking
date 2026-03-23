@@ -23,7 +23,7 @@ const getUserBookings = async (userId, filters = {}) => {
       b.Status,
       b.BookingDate,
       t.DepartureDate,
-      t.DepartureTime,
+      CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
       r.RouteName,
       r.DepartureCity,
       r.ArrivalCity,
@@ -89,7 +89,7 @@ const getBookingDetail = async (userId, bookingId) => {
         b.Status,
         b.BookingDate,
         t.DepartureDate,
-        t.DepartureTime,
+        CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
         r.RouteName,
         r.DepartureCity,
         r.ArrivalCity,
@@ -107,7 +107,7 @@ const getBookingDetail = async (userId, bookingId) => {
         ) as SeatDetails,
         (
           SELECT TOP 1 PaymentMethod, Status, CreatedAt, ExternalTransactionId
-          FROM Transactions
+          FROM Payments
           WHERE BookingId = b.BookingId
           ORDER BY CreatedAt DESC
           FOR JSON PATH

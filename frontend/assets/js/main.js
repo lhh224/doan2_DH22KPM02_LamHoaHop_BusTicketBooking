@@ -588,8 +588,15 @@ function renderTripList(trips) {
       const parseDateTime = (dateStr, timeStr) => {
         if (!dateStr || !timeStr) return new Date();
         const dateOnly = new Date(dateStr).toISOString().split('T')[0];
-        // timeStr có thể là HH:mm:ss.000 hoặc HH:mm
-        const timeOnly = timeStr.includes('.') ? timeStr.split('.')[0] : timeStr;
+        
+        // Nếu timeStr là ISO string (chứa T), lấy phần HH:mm:ss
+        let timeOnly = timeStr;
+        if (timeStr.includes('T')) {
+          timeOnly = timeStr.split('T')[1].split('.')[0];
+        } else if (timeStr.includes('.')) {
+          timeOnly = timeStr.split('.')[0];
+        }
+        
         return new Date(`${dateOnly}T${timeOnly}`);
       };
 
@@ -697,7 +704,15 @@ function createTripCard(trip) {
   const parseDateTime = (dateStr, timeStr) => {
     if (!dateStr || !timeStr) return new Date();
     const dateOnly = new Date(dateStr).toISOString().split('T')[0];
-    const timeOnly = timeStr.includes('.') ? timeStr.split('.')[0] : timeStr;
+    
+    // Nếu timeStr là ISO string (chứa T), lấy phần HH:mm:ss
+    let timeOnly = timeStr;
+    if (timeStr.includes('T')) {
+      timeOnly = timeStr.split('T')[1].split('.')[0];
+    } else if (timeStr.includes('.')) {
+      timeOnly = timeStr.split('.')[0];
+    }
+    
     return new Date(`${dateOnly}T${timeOnly}`);
   };
 

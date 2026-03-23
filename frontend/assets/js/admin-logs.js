@@ -29,9 +29,10 @@ async function renderLogsSection() {
           <input type="date" class="search-input" id="txnToDate" style="min-width:160px" onchange="loadTransactionLogs()" />
           <select class="search-input" id="txnStatusFilter" onchange="loadTransactionLogs()">
             <option value="">Tất cả trạng thái</option>
-            <option value="SUCCESS">Thành công</option>
+            <option value="COMPLETED">Thành công</option>
             <option value="PENDING">Đang xử lý</option>
             <option value="FAILED">Thất bại</option>
+            <option value="REFUNDED">Đã hoàn tiền</option>
           </select>
           <div class="toolbar-info" id="txnLogsInfo" style="margin-left: 16px; font-weight: 500; color: var(--text-secondary);">Đang tải...</div>
         </div>
@@ -43,7 +44,7 @@ async function renderLogsSection() {
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th style="display:none">ID</th>
                   <th>Mã Booking</th>
                   <th>Mã Vé</th>
                   <th>Khách Hàng</th>
@@ -163,7 +164,7 @@ async function loadTransactionLogs() {
       .map(
         (log) => `
       <tr>
-        <td>#${log.TransactionId}</td>
+        <td style="display:none">#${log.PaymentId}</td>
         <td><strong>#${log.BookingId}</strong></td>
         <td><small>${log.TicketCode || "--"}</small></td>
         <td>

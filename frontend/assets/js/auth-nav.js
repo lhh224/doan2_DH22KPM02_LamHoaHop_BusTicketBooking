@@ -36,7 +36,7 @@ function updateNavigationAuth() {
       // Thêm menu người dùng
       const userMenuItem = document.createElement("li");
       userMenuItem.innerHTML = `
-        <a href="#" class="user-menu">
+        <a href="#" class="user-menu nav-link-black">
           <i class="fas fa-user-circle"></i> ${user.HoTen || user.Email}
         </a>
       `;
@@ -45,7 +45,7 @@ function updateNavigationAuth() {
       // Thêm menu đăng xuất
       const logoutMenuItem = document.createElement("li");
       logoutMenuItem.innerHTML = `
-        <a href="#" onclick="handleLogout(event)" style="color: #e74c3c;">
+        <a href="#" onclick="handleLogout(event)" class="nav-link-black">
           <i class="fas fa-sign-out-alt"></i> Đăng Xuất
         </a>
       `;
@@ -55,7 +55,7 @@ function updateNavigationAuth() {
       if (user.VaiTro === "ADMIN") {
         const adminMenuItem = document.createElement("li");
         adminMenuItem.innerHTML = `
-          <a href="admin.html" style="color: #f39c12;">
+          <a href="admin.html" class="nav-link-black">
             <i class="fas fa-cog"></i> Quản Trị
           </a>
         `;

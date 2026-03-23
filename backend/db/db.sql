@@ -4,6 +4,7 @@
 -- Database: BusTicketBooking
 -- Mô tả: Hệ thống đặt vé xe khách trực tuyến
 -- Ngôn ngữ: Tên bảng/cột tiếng Anh, dữ liệu mẫu tiếng Việt
+-- Phiên bản: 2.0 (Chuẩn hóa)
 -- ================================================================
 
 -- Tạo database nếu chưa tồn tại
@@ -57,7 +58,7 @@ IF OBJECT_ID('dbo.sp_ConfirmPayment', 'P') IS NOT NULL DROP PROCEDURE dbo.sp_Con
 GO
 
 -- ================================================================
--- PHẦN 2: TẠO BẢNG MỚI (English names)
+-- PHẦN 2: TẠO BẢNG MỚI (Chuẩn hóa)
 -- ================================================================
 
 -- Bảng 1: Companies (Nhà xe)
@@ -68,7 +69,7 @@ CREATE TABLE Companies (
   Email NVARCHAR(100),
   Address NVARCHAR(500),
   Description NVARCHAR(MAX),
-  Rating DECIMAL(3,2) DEFAULT 5.0,
+  Rating DECIMAL(3,2) DEFAULT 5.0 CHECK (Rating >= 0 AND Rating <= 5),
   CustomerHotline NVARCHAR(20),
   IsActive BIT DEFAULT 1,
   CreatedAt DATETIME DEFAULT GETDATE(),
@@ -80,7 +81,7 @@ GO
 CREATE TABLE BusTypes (
   BusTypeId INT IDENTITY(1,1) PRIMARY KEY,
   BusTypeName NVARCHAR(100) NOT NULL,
-  TotalSeats INT NOT NULL,
+  TotalSeats INT NOT NULL CHECK (TotalSeats > 0),
   SeatLayout NVARCHAR(50),
   Amenities NVARCHAR(500)
 );
@@ -92,8 +93,8 @@ CREATE TABLE Routes (
   RouteName NVARCHAR(200) NOT NULL,
   DepartureCity NVARCHAR(100) NOT NULL,
   ArrivalCity NVARCHAR(100) NOT NULL,
-  Distance INT DEFAULT 0,
-  EstimatedDuration FLOAT DEFAULT 0,
+  Distance INT NOT NULL DEFAULT 0 CHECK (Distance >= 0),
+  EstimatedDuration DECIMAL(4,1) NOT NULL DEFAULT 0 CHECK (EstimatedDuration >= 0),
   ImageUrl NVARCHAR(500),
   IsActive BIT DEFAULT 1,
   CreatedAt DATETIME DEFAULT GETDATE()
@@ -104,10 +105,10 @@ GO
 CREATE TABLE Stops (
   StopId INT IDENTITY(1,1) PRIMARY KEY,
   RouteId INT NOT NULL,
-  StopOrder INT NOT NULL,
+  StopOrder INT NOT NULL CHECK (StopOrder > 0),
   StopName NVARCHAR(200) NOT NULL,
   StopAddress NVARCHAR(500),
-  DistanceFromStart INT DEFAULT 0,
+  DistanceFromStart INT NOT NULL DEFAULT 0 CHECK (DistanceFromStart >= 0),
   Longitude FLOAT,
   Latitude FLOAT,
   IsActive BIT DEFAULT 1,
@@ -117,15 +118,16 @@ CREATE TABLE Stops (
 GO
 
 -- Bảng 5: Trips (Chuyến xe)
+-- DepartureTime/ArrivalTime: đổi từ VARCHAR(8) sang TIME
 CREATE TABLE Trips (
   TripId INT IDENTITY(1,1) PRIMARY KEY,
   RouteId INT NOT NULL,
   CompanyId INT NOT NULL,
   BusTypeId INT NOT NULL,
-  DepartureTime VARCHAR(8),
-  ArrivalTime VARCHAR(8),
+  DepartureTime TIME NOT NULL,
+  ArrivalTime TIME NOT NULL,
   DepartureDate DATE NOT NULL,
-  Price DECIMAL(10,2) NOT NULL,
+  Price DECIMAL(10,2) NOT NULL CHECK (Price > 0),
   IsActive BIT DEFAULT 1,
   CreatedAt DATETIME DEFAULT GETDATE(),
   UpdatedAt DATETIME DEFAULT GETDATE(),
@@ -136,13 +138,15 @@ CREATE TABLE Trips (
 GO
 
 -- Bảng 6: Seats (Ghế ngồi)
+-- Thêm UNIQUE(TripId, SeatCode), CHECK cho Status, SeatType dùng English
 CREATE TABLE Seats (
   SeatId INT IDENTITY(1,1) PRIMARY KEY,
   TripId INT NOT NULL,
   SeatCode NVARCHAR(10) NOT NULL,
-  SeatType NVARCHAR(50) DEFAULT N'Thường',
-  Status VARCHAR(20) DEFAULT 'AVAILABLE',
-  FOREIGN KEY (TripId) REFERENCES Trips(TripId)
+  SeatType VARCHAR(20) DEFAULT 'STANDARD' CHECK (SeatType IN ('STANDARD', 'VIP', 'PREMIUM')),
+  Status VARCHAR(20) DEFAULT 'AVAILABLE' CHECK (Status IN ('AVAILABLE', 'LOCKED', 'BOOKED')),
+  FOREIGN KEY (TripId) REFERENCES Trips(TripId),
+  CONSTRAINT UQ_Seats_TripId_SeatCode UNIQUE (TripId, SeatCode)
 );
 GO
 
@@ -155,7 +159,7 @@ CREATE TABLE Users (
   FullName NVARCHAR(100) NOT NULL,
   Phone NVARCHAR(20),
   Address NVARCHAR(500),
-  Role VARCHAR(20) DEFAULT 'CUSTOMER',
+  Role VARCHAR(20) DEFAULT 'CUSTOMER' CHECK (Role IN ('ADMIN', 'STAFF', 'CUSTOMER')),
   Status BIT DEFAULT 1,
   EmailVerified BIT DEFAULT 0,
   CreatedAt DATETIME DEFAULT GETDATE(),
@@ -165,19 +169,20 @@ CREATE TABLE Users (
 GO
 
 -- Bảng 8: Bookings (Đặt vé)
+-- Thêm UNIQUE(TicketCode), CHECK cho Status
 CREATE TABLE Bookings (
   BookingId INT IDENTITY(1,1) PRIMARY KEY,
   TripId INT NOT NULL,
   UserId INT,
-  TicketCode NVARCHAR(50),
+  TicketCode NVARCHAR(50) UNIQUE,
   CustomerName NVARCHAR(100) NOT NULL,
   CustomerPhone NVARCHAR(20) NOT NULL,
   CustomerEmail NVARCHAR(100),
   PickupStopOrder INT,
   DropoffStopOrder INT,
-  SeatCount INT DEFAULT 1,
-  TotalAmount DECIMAL(10,2) NOT NULL,
-  Status VARCHAR(20) DEFAULT 'PENDING',
+  SeatCount INT DEFAULT 1 CHECK (SeatCount > 0),
+  TotalAmount DECIMAL(10,2) NOT NULL CHECK (TotalAmount >= 0),
+  Status VARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'PAID', 'CANCELLED')),
   BookingDate DATETIME DEFAULT GETDATE(),
   UpdatedAt DATETIME DEFAULT GETDATE(),
   FOREIGN KEY (TripId) REFERENCES Trips(TripId),
@@ -190,30 +195,36 @@ CREATE TABLE BookingDetails (
   BookingDetailId INT IDENTITY(1,1) PRIMARY KEY,
   BookingId INT NOT NULL,
   SeatCode NVARCHAR(10) NOT NULL,
-  Price DECIMAL(10,2) DEFAULT 0,
+  Price DECIMAL(10,2) DEFAULT 0 CHECK (Price >= 0),
   FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId)
 );
 GO
 
--- Bảng 10: Payments (Thanh toán)
+-- Bảng 10: Payments (Thanh toán + Lịch sử giao dịch - gộp từ Payments & Transactions)
+-- Gộp 2 bảng cũ Payments + Transactions thành 1 bảng duy nhất
 CREATE TABLE Payments (
   PaymentId INT IDENTITY(1,1) PRIMARY KEY,
   BookingId INT NOT NULL,
-  Amount DECIMAL(10,2) NOT NULL,
+  Amount DECIMAL(10,2) NOT NULL CHECK (Amount >= 0),
   PaymentMethod NVARCHAR(50),
-  Status VARCHAR(20) DEFAULT 'PENDING',
+  Status VARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED')),
   TransactionId NVARCHAR(100),
+  ExternalTransactionId NVARCHAR(100),
+  Note NVARCHAR(500),
   PaymentDate DATETIME DEFAULT GETDATE(),
+  CreatedAt DATETIME DEFAULT GETDATE(),
   FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId)
 );
 GO
 
 -- Bảng 11: Sessions (Phiên đăng nhập)
+-- Thêm cột Status để hỗ trợ quản lý phiên (backend đang dùng)
 CREATE TABLE Sessions (
   SessionId INT IDENTITY(1,1) PRIMARY KEY,
   UserId INT NOT NULL,
   Token NVARCHAR(500),
   RefreshToken NVARCHAR(500),
+  Status VARCHAR(20) DEFAULT 'ACTIVE' CHECK (Status IN ('ACTIVE', 'REVOKED', 'EXPIRED')),
   ExpiresAt DATETIME,
   CreatedAt DATETIME DEFAULT GETDATE(),
   FOREIGN KEY (UserId) REFERENCES Users(UserId)
@@ -226,7 +237,7 @@ CREATE TABLE Notifications (
   UserId INT NOT NULL,
   Title NVARCHAR(200),
   Content NVARCHAR(MAX),
-  Type VARCHAR(20) DEFAULT 'SYSTEM',
+  Type VARCHAR(20) DEFAULT 'SYSTEM' CHECK (Type IN ('SYSTEM', 'BOOKING', 'PAYMENT', 'PROMOTION')),
   IsRead BIT DEFAULT 0,
   CreatedAt DATETIME DEFAULT GETDATE(),
   ReadAt DATETIME,
@@ -234,21 +245,7 @@ CREATE TABLE Notifications (
 );
 GO
 
--- Bảng 13: Transactions (Lịch sử giao dịch)
-CREATE TABLE Transactions (
-  TransactionId INT IDENTITY(1,1) PRIMARY KEY,
-  BookingId INT NOT NULL,
-  Amount DECIMAL(10,2) NOT NULL,
-  PaymentMethod NVARCHAR(50),
-  Status VARCHAR(20) DEFAULT 'PENDING',
-  ExternalTransactionId NVARCHAR(100),
-  Note NVARCHAR(500),
-  CreatedAt DATETIME DEFAULT GETDATE(),
-  FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId)
-);
-GO
-
--- Bảng 14: Reviews (Đánh giá)
+-- Bảng 13: Reviews (Đánh giá)
 CREATE TABLE Reviews (
   ReviewId INT IDENTITY(1,1) PRIMARY KEY,
   BookingId INT,
@@ -258,7 +255,7 @@ CREATE TABLE Reviews (
   Rating INT NOT NULL CHECK (Rating >= 1 AND Rating <= 5),
   Title NVARCHAR(200),
   Content NVARCHAR(MAX),
-  Status VARCHAR(20) DEFAULT 'PENDING',
+  Status VARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'APPROVED', 'REJECTED')),
   CreatedAt DATETIME DEFAULT GETDATE(),
   ApprovedAt DATETIME,
   FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId),
@@ -276,17 +273,23 @@ CREATE INDEX IX_Trips_RouteId ON Trips(RouteId);
 CREATE INDEX IX_Trips_CompanyId ON Trips(CompanyId);
 CREATE INDEX IX_Trips_BusTypeId ON Trips(BusTypeId);
 CREATE INDEX IX_Trips_DepartureDate ON Trips(DepartureDate);
+CREATE INDEX IX_Trips_DepartureDate_Time ON Trips(DepartureDate, DepartureTime);
 CREATE INDEX IX_Seats_TripId ON Seats(TripId);
-CREATE INDEX IX_Seats_SeatCode ON Seats(SeatCode);
 CREATE INDEX IX_Bookings_TripId ON Bookings(TripId);
 CREATE INDEX IX_Bookings_UserId ON Bookings(UserId);
 CREATE INDEX IX_Bookings_Status ON Bookings(Status);
+CREATE INDEX IX_Bookings_TicketCode ON Bookings(TicketCode);
 CREATE INDEX IX_BookingDetails_BookingId ON BookingDetails(BookingId);
 CREATE INDEX IX_Stops_RouteId ON Stops(RouteId);
 CREATE INDEX IX_Users_Username ON Users(Username);
+CREATE INDEX IX_Users_Email ON Users(Email);
 CREATE INDEX IX_Sessions_UserId ON Sessions(UserId);
+CREATE INDEX IX_Sessions_Status ON Sessions(Status);
 CREATE INDEX IX_Notifications_UserId ON Notifications(UserId);
+CREATE INDEX IX_Payments_BookingId ON Payments(BookingId);
+CREATE INDEX IX_Payments_Status ON Payments(Status);
 CREATE INDEX IX_Reviews_CompanyId ON Reviews(CompanyId);
+CREATE INDEX IX_Reviews_TripId ON Reviews(TripId);
 GO
 
 -- ================================================================
@@ -407,6 +410,7 @@ END;
 GO
 
 -- SP 2: sp_ConfirmPayment - Xác nhận thanh toán
+-- Cập nhật: chỉ insert vào bảng Payments (đã gộp Transactions)
 CREATE PROCEDURE sp_ConfirmPayment
   @BookingId INT,
   @PaymentMethod NVARCHAR(50) = 'QR',
@@ -443,17 +447,13 @@ BEGIN
     SET Status = 'PAID', UpdatedAt = GETDATE()
     WHERE BookingId = @BookingId;
 
-    -- 3. Thêm bản ghi thanh toán
-    INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, PaymentDate)
-    VALUES (@BookingId, @TotalAmount, @PaymentMethod, 'COMPLETED', @TransactionId, GETDATE());
-
-    -- 4. Thêm lịch sử giao dịch
-    INSERT INTO Transactions (BookingId, Amount, PaymentMethod, Status, ExternalTransactionId, Note, CreatedAt)
-    VALUES (@BookingId, @TotalAmount, @PaymentMethod, 'SUCCESS', @TransactionId, N'Thanh toán thành công', GETDATE());
+    -- 3. Thêm bản ghi thanh toán (gộp cả lịch sử giao dịch)
+    INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, ExternalTransactionId, Note, PaymentDate, CreatedAt)
+    VALUES (@BookingId, @TotalAmount, @PaymentMethod, 'COMPLETED', @TransactionId, @TransactionId, N'Thanh toán thành công', GETDATE(), GETDATE());
 
     COMMIT TRANSACTION;
 
-    -- 5. Trả về thông tin
+    -- 4. Trả về thông tin
     SELECT 
       b.BookingId,
       b.TicketCode,
@@ -500,68 +500,68 @@ INSERT INTO BusTypes (BusTypeId, BusTypeName, TotalSeats, SeatLayout, Amenities)
 SET IDENTITY_INSERT BusTypes OFF;
 GO
 
--- 5.3: Tuyến đường (Routes)
+-- 5.3: Tuyến đường (Routes) - Sửa mapping đúng + ImageUrl nhất quán
 SET IDENTITY_INSERT Routes ON;
 INSERT INTO Routes (RouteId, RouteName, DepartureCity, ArrivalCity, Distance, EstimatedDuration, ImageUrl, IsActive) VALUES
-(1, N'TP.HCM - Đà Lạt', N'TP.HCM', N'Đà Lạt', 300, 7.0, 'https://images.unsplash.com/photo-1582218109194-3528b17a1262?w=800', 1),
-(2, N'TP.HCM - Nha Trang', N'TP.HCM', N'Nha Trang', 450, 9.5, 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800', 1),
-(3, N'TP.HCM - Vũng Tàu', N'TP.HCM', N'Vũng Tàu', 100, 2.5, 'https://images.unsplash.com/photo-1579710385551-789bc72d689b?w=800', 1),
-(4, N'Đà Nẵng - Hội An', N'Đà Nẵng', N'Hội An', 30, 1.0, 'https://images.unsplash.com/photo-1555581908-173fd21dfc5b?w=800', 1),
-(5, N'Hà Nội - Sa Pa', N'Hà Nội', N'Sa Pa', 320, 6.0, 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800', 1),
-(6, N'Hà Nội - Hải Phòng', N'Hà Nội', N'Hải Phòng', 120, 2.0, 'hanoi-haiphong.jpg', 1),
-(7, N'TP.HCM - Cần Thơ', N'TP.HCM', N'Cần Thơ', 170, 3.5, 'tphcm-cantho.jpg', 1),
-(8, N'TP.HCM - Buôn Ma Thuột', N'TP.HCM', N'Buôn Ma Thuột', 350, 8.0, 'tphcm-bmt.jpg', 1);
+(1, N'TP.HCM - Đà Lạt',      N'TP.HCM',   N'Đà Lạt',        300, 7.0, 'https://images.unsplash.com/photo-1582218109194-3528b17a1262?w=800', 1),
+(2, N'TP.HCM - Nha Trang',    N'TP.HCM',   N'Nha Trang',      450, 9.5, 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800', 1),
+(3, N'TP.HCM - Đà Nẵng',     N'TP.HCM',   N'Đà Nẵng',        960, 18.0,'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800', 1),
+(4, N'TP.HCM - Vũng Tàu',    N'TP.HCM',   N'Vũng Tàu',       125, 2.5, 'https://images.unsplash.com/photo-1579710385551-789bc72d689b?w=800', 1),
+(5, N'Hà Nội - Sa Pa',        N'Hà Nội',   N'Sa Pa',           320, 6.0, 'https://images.unsplash.com/photo-1528127269322-539801943592?w=800', 1),
+(6, N'Hà Nội - Hải Phòng',    N'Hà Nội',   N'Hải Phòng',      120, 2.0, 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800', 1),
+(7, N'TP.HCM - Cần Thơ',     N'TP.HCM',   N'Cần Thơ',        170, 3.5, 'https://images.unsplash.com/photo-1555921015-5532091f6026?w=800', 1),
+(8, N'TP.HCM - Buôn Ma Thuột',N'TP.HCM',   N'Buôn Ma Thuột',  350, 8.0, 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800', 1);
 SET IDENTITY_INSERT Routes OFF;
 GO
 
--- 5.4: Điểm dừng (Stops) - 4~5 điểm mỗi tuyến
+-- 5.4: Điểm dừng (Stops) - Sửa mapping đúng Route↔Stops
 SET IDENTITY_INSERT Stops ON;
 INSERT INTO Stops (StopId, RouteId, StopOrder, StopName, StopAddress, DistanceFromStart, Longitude, Latitude, IsActive) VALUES
--- Tuyến 1: TP.HCM - Đà Lạt
-(1,  1, 1, N'Bến xe Miền Đông', N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM', 0, 106.7139, 10.8148, 1),
-(2,  1, 2, N'Ngã ba Dầu Giây', N'Quốc lộ 1A, Thống Nhất, Đồng Nai', 70, 107.1844, 10.9016, 1),
-(3,  1, 3, N'Bảo Lộc', N'TP. Bảo Lộc, Lâm Đồng', 180, 107.8117, 11.5481, 1),
-(4,  1, 4, N'Đức Trọng', N'Huyện Đức Trọng, Lâm Đồng', 250, 108.3653, 11.7271, 1),
-(5,  1, 5, N'Bến xe Đà Lạt', N'01 Tô Hiến Thành, Phường 3, Đà Lạt', 300, 108.4483, 11.9404, 1),
--- Tuyến 2: TP.HCM - Nha Trang
-(6,  2, 1, N'Bến xe Miền Đông', N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM', 0, 106.7139, 10.8148, 1),
-(7,  2, 2, N'Phan Thiết', N'TP. Phan Thiết, Bình Thuận', 200, 108.1002, 10.9289, 1),
-(8,  2, 3, N'Cam Ranh', N'TP. Cam Ranh, Khánh Hòa', 380, 109.1442, 11.9214, 1),
-(9,  2, 4, N'Bến xe Nha Trang', N'58 Vùng Trung, Nha Trang, Khánh Hòa', 430, 109.1967, 12.2388, 1),
--- Tuyến 3: TP.HCM - Đà Nẵng
-(10, 3, 1, N'Bến xe Miền Đông', N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM', 0, 106.7139, 10.8148, 1),
-(11, 3, 2, N'Nha Trang', N'TP. Nha Trang, Khánh Hòa', 430, 109.1967, 12.2388, 1),
-(12, 3, 3, N'Quy Nhơn', N'TP. Quy Nhơn, Bình Định', 680, 109.2237, 13.7760, 1),
-(13, 3, 4, N'Quảng Ngãi', N'TP. Quảng Ngãi, Quảng Ngãi', 830, 108.8004, 15.1206, 1),
-(14, 3, 5, N'Bến xe Đà Nẵng', N'33 Điện Biên Phủ, Thanh Khê, Đà Nẵng', 960, 108.2068, 16.0471, 1),
--- Tuyến 4: TP.HCM - Vũng Tàu
-(15, 4, 1, N'Bến xe Miền Đông', N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM', 0, 106.7139, 10.8148, 1),
-(16, 4, 2, N'Long Thành', N'Huyện Long Thành, Đồng Nai', 50, 106.9504, 10.7849, 1),
-(17, 4, 3, N'Bà Rịa', N'TP. Bà Rịa, Bà Rịa - Vũng Tàu', 90, 107.1685, 10.4960, 1),
-(18, 4, 4, N'Bến xe Vũng Tàu', N'192 Nam Kỳ Khởi Nghĩa, Vũng Tàu', 125, 107.0843, 10.3460, 1),
--- Tuyến 5: Hà Nội - Đà Nẵng
-(19, 5, 1, N'Bến xe Giáp Bát', N'Giải Phóng, Hoàng Mai, Hà Nội', 0, 105.8411, 20.9809, 1),
-(20, 5, 2, N'Vinh', N'TP. Vinh, Nghệ An', 290, 105.6894, 18.6790, 1),
-(21, 5, 3, N'Huế', N'TP. Huế, Thừa Thiên Huế', 660, 107.5909, 16.4637, 1),
-(22, 5, 4, N'Bến xe Đà Nẵng', N'33 Điện Biên Phủ, Thanh Khê, Đà Nẵng', 770, 108.2068, 16.0471, 1),
--- Tuyến 6: Hà Nội - Hải Phòng
-(23, 6, 1, N'Bến xe Giáp Bát', N'Giải Phóng, Hoàng Mai, Hà Nội', 0, 105.8411, 20.9809, 1),
-(24, 6, 2, N'Hải Dương', N'TP. Hải Dương, Hải Dương', 60, 106.3134, 20.9397, 1),
-(25, 6, 3, N'Bến xe Hải Phòng', N'Lạch Tray, Ngô Quyền, Hải Phòng', 120, 106.6881, 20.8449, 1),
--- Tuyến 7: TP.HCM - Cần Thơ
-(26, 7, 1, N'Bến xe Miền Tây', N'395 Kinh Dương Vương, Bình Tân, TP.HCM', 0, 106.6174, 10.7379, 1),
-(27, 7, 2, N'Mỹ Tho', N'TP. Mỹ Tho, Tiền Giang', 70, 106.3653, 10.3550, 1),
-(28, 7, 3, N'Vĩnh Long', N'TP. Vĩnh Long, Vĩnh Long', 120, 105.9733, 10.2518, 1),
-(29, 7, 4, N'Bến xe Cần Thơ', N'91B Nguyễn Văn Linh, Ninh Kiều, Cần Thơ', 170, 105.7469, 10.0452, 1),
--- Tuyến 8: TP.HCM - Buôn Ma Thuột
-(30, 8, 1, N'Bến xe Miền Đông', N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM', 0, 106.7139, 10.8148, 1),
-(31, 8, 2, N'Ngã ba Dầu Giây', N'Quốc lộ 1A, Thống Nhất, Đồng Nai', 70, 107.1844, 10.9016, 1),
-(32, 8, 3, N'Gia Nghĩa', N'TP. Gia Nghĩa, Đắk Nông', 230, 107.6881, 11.9781, 1),
-(33, 8, 4, N'Bến xe Buôn Ma Thuột', N'TP. Buôn Ma Thuột, Đắk Lắk', 350, 108.0378, 12.6814, 1);
+-- Tuyến 1: TP.HCM - Đà Lạt (RouteId=1)
+(1,  1, 1, N'Bến xe Miền Đông',  N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM',    0,   106.7139, 10.8148, 1),
+(2,  1, 2, N'Ngã ba Dầu Giây',   N'Quốc lộ 1A, Thống Nhất, Đồng Nai',         70,  107.1844, 10.9016, 1),
+(3,  1, 3, N'Bảo Lộc',           N'TP. Bảo Lộc, Lâm Đồng',                    180, 107.8117, 11.5481, 1),
+(4,  1, 4, N'Đức Trọng',         N'Huyện Đức Trọng, Lâm Đồng',                250, 108.3653, 11.7271, 1),
+(5,  1, 5, N'Bến xe Đà Lạt',     N'01 Tô Hiến Thành, Phường 3, Đà Lạt',       300, 108.4483, 11.9404, 1),
+-- Tuyến 2: TP.HCM - Nha Trang (RouteId=2)
+(6,  2, 1, N'Bến xe Miền Đông',  N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM',     0,   106.7139, 10.8148, 1),
+(7,  2, 2, N'Phan Thiết',        N'TP. Phan Thiết, Bình Thuận',                200, 108.1002, 10.9289, 1),
+(8,  2, 3, N'Cam Ranh',          N'TP. Cam Ranh, Khánh Hòa',                   380, 109.1442, 11.9214, 1),
+(9,  2, 4, N'Bến xe Nha Trang',  N'58 Vùng Trung, Nha Trang, Khánh Hòa',      430, 109.1967, 12.2388, 1),
+-- Tuyến 3: TP.HCM - Đà Nẵng (RouteId=3) — SỬA: trước đây map sai sang Vũng Tàu
+(10, 3, 1, N'Bến xe Miền Đông',  N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM',     0,   106.7139, 10.8148, 1),
+(11, 3, 2, N'Nha Trang',         N'TP. Nha Trang, Khánh Hòa',                  430, 109.1967, 12.2388, 1),
+(12, 3, 3, N'Quy Nhơn',          N'TP. Quy Nhơn, Bình Định',                   680, 109.2237, 13.7760, 1),
+(13, 3, 4, N'Quảng Ngãi',        N'TP. Quảng Ngãi, Quảng Ngãi',                830, 108.8004, 15.1206, 1),
+(14, 3, 5, N'Bến xe Đà Nẵng',    N'33 Điện Biên Phủ, Thanh Khê, Đà Nẵng',     960, 108.2068, 16.0471, 1),
+-- Tuyến 4: TP.HCM - Vũng Tàu (RouteId=4) — SỬA: trước đây map sai sang Đà Nẵng
+(15, 4, 1, N'Bến xe Miền Đông',  N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM',     0,   106.7139, 10.8148, 1),
+(16, 4, 2, N'Long Thành',        N'Huyện Long Thành, Đồng Nai',                50,  106.9504, 10.7849, 1),
+(17, 4, 3, N'Bà Rịa',           N'TP. Bà Rịa, Bà Rịa - Vũng Tàu',           90,  107.1685, 10.4960, 1),
+(18, 4, 4, N'Bến xe Vũng Tàu',  N'192 Nam Kỳ Khởi Nghĩa, Vũng Tàu',          125, 107.0843, 10.3460, 1),
+-- Tuyến 5: Hà Nội - Sa Pa (RouteId=5) — SỬA: trước đây stops sai (tới Đà Nẵng)
+(19, 5, 1, N'Bến xe Mỹ Đình',    N'20 Phạm Hùng, Nam Từ Liêm, Hà Nội',        0,   105.7823, 21.0285, 1),
+(20, 5, 2, N'Yên Bái',           N'TP. Yên Bái, Yên Bái',                      180, 104.8667, 21.7168, 1),
+(21, 5, 3, N'Lào Cai',           N'TP. Lào Cai, Lào Cai',                      290, 103.9707, 22.4856, 1),
+(22, 5, 4, N'Bến xe Sa Pa',      N'TT. Sa Pa, Lào Cai',                        320, 103.8440, 22.3363, 1),
+-- Tuyến 6: Hà Nội - Hải Phòng (RouteId=6)
+(23, 6, 1, N'Bến xe Giáp Bát',   N'Giải Phóng, Hoàng Mai, Hà Nội',             0,   105.8411, 20.9809, 1),
+(24, 6, 2, N'Hải Dương',         N'TP. Hải Dương, Hải Dương',                  60,  106.3134, 20.9397, 1),
+(25, 6, 3, N'Bến xe Hải Phòng',  N'Lạch Tray, Ngô Quyền, Hải Phòng',          120, 106.6881, 20.8449, 1),
+-- Tuyến 7: TP.HCM - Cần Thơ (RouteId=7)
+(26, 7, 1, N'Bến xe Miền Tây',   N'395 Kinh Dương Vương, Bình Tân, TP.HCM',    0,   106.6174, 10.7379, 1),
+(27, 7, 2, N'Mỹ Tho',            N'TP. Mỹ Tho, Tiền Giang',                   70,  106.3653, 10.3550, 1),
+(28, 7, 3, N'Vĩnh Long',         N'TP. Vĩnh Long, Vĩnh Long',                 120, 105.9733, 10.2518, 1),
+(29, 7, 4, N'Bến xe Cần Thơ',    N'91B Nguyễn Văn Linh, Ninh Kiều, Cần Thơ',  170, 105.7469, 10.0452, 1),
+-- Tuyến 8: TP.HCM - Buôn Ma Thuột (RouteId=8)
+(30, 8, 1, N'Bến xe Miền Đông',  N'292 Đinh Bộ Lĩnh, Bình Thạnh, TP.HCM',     0,   106.7139, 10.8148, 1),
+(31, 8, 2, N'Ngã ba Dầu Giây',   N'Quốc lộ 1A, Thống Nhất, Đồng Nai',         70,  107.1844, 10.9016, 1),
+(32, 8, 3, N'Gia Nghĩa',         N'TP. Gia Nghĩa, Đắk Nông',                  230, 107.6881, 11.9781, 1),
+(33, 8, 4, N'Bến xe Buôn Ma Thuột', N'TP. Buôn Ma Thuột, Đắk Lắk',            350, 108.0378, 12.6814, 1);
 SET IDENTITY_INSERT Stops OFF;
 GO
 
--- 5.5: Chuyến xe (Trips) - sử dụng ngày tương đối so với hôm nay
+-- 5.5: Chuyến xe (Trips) - DepartureTime/ArrivalTime dùng kiểu TIME
 INSERT INTO Trips (RouteId, CompanyId, BusTypeId, DepartureTime, ArrivalTime, DepartureDate, Price, IsActive) VALUES
 -- Chuyến 1: TPHCM → Đà Lạt, Phương Trang, Limousine, ngày mai
 (1, 1, 3, '07:00', '14:00', DATEADD(day, 1, CAST(GETDATE() AS DATE)), 350000, 1),
@@ -573,8 +573,8 @@ INSERT INTO Trips (RouteId, CompanyId, BusTypeId, DepartureTime, ArrivalTime, De
 (3, 3, 2, '18:00', '11:00', DATEADD(day, 3, CAST(GETDATE() AS DATE)), 550000, 1),
 -- Chuyến 5: TPHCM → Vũng Tàu, Kumho Samco, Ghế ngồi, ngày mai
 (4, 4, 1, '08:00', '10:30', DATEADD(day, 1, CAST(GETDATE() AS DATE)), 120000, 1),
--- Chuyến 6: HN → Đà Nẵng, Hoàng Long, Limousine, +2 ngày
-(5, 3, 3, '19:00', '09:00', DATEADD(day, 2, CAST(GETDATE() AS DATE)), 600000, 1),
+-- Chuyến 6: HN → Sa Pa, Hoàng Long, Limousine, +2 ngày
+(5, 3, 3, '19:00', '01:00', DATEADD(day, 2, CAST(GETDATE() AS DATE)), 600000, 1),
 -- Chuyến 7: HN → Hải Phòng, Hải Vân, Ghế ngồi, ngày mai
 (6, 5, 1, '07:00', '09:00', DATEADD(day, 1, CAST(GETDATE() AS DATE)), 100000, 1),
 -- Chuyến 8: TPHCM → Cần Thơ, Phương Trang, Ghế ngồi, +2 ngày
@@ -607,7 +607,7 @@ BEGIN
     SET @col = ((@i - 1) % 10) + 1;
     
     INSERT INTO Seats (TripId, SeatCode, SeatType, Status)
-    VALUES (@TripId, @row + RIGHT('0' + CAST(@col AS VARCHAR), 2), N'Thường', 'AVAILABLE');
+    VALUES (@TripId, @row + RIGHT('0' + CAST(@col AS VARCHAR), 2), 'STANDARD', 'AVAILABLE');
     
     SET @i = @i + 1;
   END
@@ -647,25 +647,19 @@ INSERT INTO BookingDetails (BookingId, SeatCode, Price) VALUES
 (3, 'B01', 120000);
 GO
 
--- 5.10: Thanh toán (Payments)
-INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, PaymentDate) VALUES
-(1, 700000, N'QR', 'COMPLETED', 'TXN-20250701-001', DATEADD(day, -1, GETDATE())),
-(2, 250000, N'QR', 'COMPLETED', 'TXN-20250701-002', DATEADD(day, -1, GETDATE()));
+-- 5.10: Thanh toán (Payments) - gộp dữ liệu từ Payments + Transactions cũ
+INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, ExternalTransactionId, Note, PaymentDate) VALUES
+(1, 700000, N'QR', 'COMPLETED', 'TXN-20250701-001', 'TXN-20250701-001', N'Thanh toán qua QR Code - Chuyến TP.HCM → Đà Lạt', DATEADD(day, -1, GETDATE())),
+(2, 250000, N'QR', 'COMPLETED', 'TXN-20250701-002', 'TXN-20250701-002', N'Thanh toán qua QR Code - Chuyến TP.HCM → Nha Trang', DATEADD(day, -1, GETDATE()));
 GO
 
--- 5.11: Lịch sử giao dịch (Transactions)
-INSERT INTO Transactions (BookingId, Amount, PaymentMethod, Status, ExternalTransactionId, Note) VALUES
-(1, 700000, N'QR', 'SUCCESS', 'TXN-20250701-001', N'Thanh toán qua QR Code - Chuyến TP.HCM → Đà Lạt'),
-(2, 250000, N'QR', 'SUCCESS', 'TXN-20250701-002', N'Thanh toán qua QR Code - Chuyến TP.HCM → Nha Trang');
-GO
-
--- 5.12: Đánh giá (Reviews)
+-- 5.11: Đánh giá (Reviews)
 INSERT INTO Reviews (BookingId, UserId, TripId, CompanyId, Rating, Title, Content, Status) VALUES
 (1, 3, 1, 1, 5, N'Dịch vụ xuất sắc!', N'Xe Phương Trang đi Đà Lạt rất thoải mái, tài xế lái cẩn thận, nhân viên phục vụ nhiệt tình. Xe sạch sẽ, đúng giờ. Rất hài lòng!', 'APPROVED'),
 (2, 4, 3, 1, 4, N'Tốt nhưng hơi chậm', N'Xe Phương Trang chất lượng tốt, ghế ngồi thoải mái. Tuy nhiên xe đến trễ hơn 30 phút so với lịch trình. Nhìn chung vẫn hài lòng.', 'APPROVED');
 GO
 
--- 5.13: Thông báo (Notifications)
+-- 5.12: Thông báo (Notifications)
 INSERT INTO Notifications (UserId, Title, Content, Type, IsRead) VALUES
 (3, N'Đặt vé thành công', N'Bạn đã đặt vé thành công chuyến TP.HCM → Đà Lạt ngày mai. Mã vé: VE-20250701-00001. Chúc bạn có chuyến đi vui vẻ!', 'BOOKING', 1),
 (3, N'Thanh toán thành công', N'Đơn đặt vé #1 đã được thanh toán thành công. Số tiền: 700,000 VNĐ. Vui lòng xuất trình mã QR khi lên xe.', 'PAYMENT', 0),
@@ -675,26 +669,37 @@ GO
 -- ================================================================
 -- HOÀN TẤT - TÓM TẮT BẢNG
 -- ================================================================
--- 1.  Companies     - Nhà xe (5 bản ghi)
--- 2.  BusTypes      - Loại xe (4 bản ghi)
--- 3.  Routes        - Tuyến đường (8 bản ghi)
--- 4.  Stops         - Điểm dừng (33 bản ghi)
--- 5.  Trips         - Chuyến xe (10 bản ghi)
--- 6.  Seats         - Ghế ngồi (tự động sinh ~370 bản ghi)
--- 7.  Users         - Người dùng (4 bản ghi)
--- 8.  Bookings      - Đặt vé (3 bản ghi)
+-- 1.  Companies      - Nhà xe (5 bản ghi)
+-- 2.  BusTypes       - Loại xe (4 bản ghi)
+-- 3.  Routes         - Tuyến đường (8 bản ghi)
+-- 4.  Stops          - Điểm dừng (33 bản ghi)
+-- 5.  Trips          - Chuyến xe (10 bản ghi)
+-- 6.  Seats          - Ghế ngồi (tự động sinh ~370 bản ghi)
+-- 7.  Users          - Người dùng (4 bản ghi)
+-- 8.  Bookings       - Đặt vé (3 bản ghi)
 -- 9.  BookingDetails - Chi tiết đặt vé (4 bản ghi)
--- 10. Payments      - Thanh toán (2 bản ghi)
--- 11. Sessions      - Phiên đăng nhập
--- 12. Notifications - Thông báo (3 bản ghi)
--- 13. Transactions  - Lịch sử giao dịch (2 bản ghi)
--- 14. Reviews       - Đánh giá (2 bản ghi)
+-- 10. Payments       - Thanh toán & Lịch sử giao dịch (2 bản ghi)
+-- 11. Sessions       - Phiên đăng nhập
+-- 12. Notifications  - Thông báo (3 bản ghi)
+-- 13. Reviews        - Đánh giá (2 bản ghi)
+-- ================================================================
+-- THAY ĐỔI SO VỚI V1:
+--   - DepartureTime/ArrivalTime: VARCHAR(8) → TIME
+--   - EstimatedDuration: FLOAT → DECIMAL(4,1)
+--   - Gộp Payments + Transactions → Payments (13 bảng thay vì 14)
+--   - Thêm CHECK constraints cho Status, Rating, Price, SeatCount...
+--   - Thêm UNIQUE(TripId, SeatCode) cho Seats
+--   - Thêm UNIQUE(TicketCode) cho Bookings
+--   - SeatType: N'Thường' → 'STANDARD'
+--   - Sessions: thêm cột Status
+--   - Sửa Routes/Stops mapping (Route 3↔4, Route 5)
+--   - ImageUrl: chuẩn hóa tất cả dùng URL đầy đủ
 -- ================================================================
 -- LƯU Ý: Tài khoản mặc định:
---   Admin: admin@busticket.vn / Admin@123
---   Staff: staff@busticket.vn / Admin@123
+--   Admin: admin@datvenhanh.vn / lhh123
+--   Staff: staff@datvenhanh.vn / Admin@123
 --   Customer: nguyenvana@gmail.com / User@123
 --   Customer: tranthib@gmail.com / User@123
 -- ================================================================
-PRINT N'✅ Database đã được tạo thành công với dữ liệu mẫu tiếng Việt!';
+PRINT N'✅ Database v2.0 đã được tạo thành công (chuẩn hóa)!';
 GO

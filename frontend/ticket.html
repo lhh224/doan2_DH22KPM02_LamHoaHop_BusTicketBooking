@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="assets/css/style.css" />
     <style>
       /* Success Page Specific Styles */
+      body {
+        background-color: #ffffff !important;
+        background-image: none !important;
+      }
       .ticket-container {
         max-width: 900px;
         margin: 2rem auto;
@@ -333,6 +337,16 @@
           display: none;
         }
       }
+      #errorMessage {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 1.1rem;
+        margin: 5rem auto;
+        font-weight: 500;
+        background: transparent;
+        border: none;
+        max-width: 600px;
+      }
     </style>
   </head>
 
@@ -453,7 +467,6 @@
 
       <div
         id="errorMessage"
-        class="alert alert-error"
         style="display: none"
       ></div>
 

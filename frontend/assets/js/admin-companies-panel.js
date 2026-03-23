@@ -82,7 +82,7 @@ function renderCompaniesPanelTable(data) {
       </td>
       <td>${c.Phone || "--"}</td>
       <td>${c.TotalTrips || 0}</td>
-      <td>⭐ ${c.Rating ? Number(c.Rating).toFixed(1) : "5.0"}</td>
+      <td>${c.Rating ? Number(c.Rating).toFixed(1) : "5.0"} ⭐</td>
       <td>
         <div class="btn-group">
           <button class="btn btn-sm btn-secondary" onclick="showCompanyDetail(${c.CompanyID})">Chi tiết</button>

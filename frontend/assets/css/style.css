@@ -42,7 +42,7 @@
   --box-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -184,9 +184,19 @@ html {
 
 .nav-menu a:hover,
 .nav-menu a.active {
-  color: white;
+  color: white !important;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Custom class for black nav links that turn white on hover/active */
+.nav-link-black {
+  color: #000000 !important;
+}
+
+.nav-link-black:hover,
+.nav-link-black:active {
+  color: #ffffff !important;
 }
 
 .nav-menu a i {
@@ -359,7 +369,6 @@ html {
 }
 
 .search-box:hover {
-  transform: translateY(-5px);
   box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
 }
 
@@ -415,7 +424,6 @@ html {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-  transform: scale(1.02);
 }
 
 .search-swap {

@@ -41,8 +41,8 @@ const searchTrips = async (fromCity, toCity, date) => {
     const result = await request.query(`
         SELECT 
           t.TripId,
-          t.DepartureTime,
-          t.ArrivalTime,
+          CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+          CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
           t.DepartureDate,
           t.Price as BasePrice,
           r.RouteName,
@@ -98,8 +98,8 @@ const getTripDetail = async (tripId) => {
     const result = await pool.request().input("tripId", sql.Int, tripId).query(`
         SELECT 
           t.TripId,
-          t.DepartureTime,
-          t.ArrivalTime,
+          CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+          CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
           t.DepartureDate,
           t.Price as BasePrice,
           r.RouteId,
@@ -252,8 +252,8 @@ const getAllTrips = async () => {
         t.RouteId,
         t.CompanyId,
         t.BusTypeId,
-        t.DepartureTime,
-        t.ArrivalTime,
+        CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+        CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
         t.DepartureDate,
         t.Price,
         t.IsActive,
@@ -291,8 +291,8 @@ const createTrip = async (tripData) => {
       .input("routeId", sql.Int, tripData.routeId)
       .input("companyId", sql.Int, tripData.companyId)
       .input("busTypeId", sql.Int, tripData.busTypeId)
-      .input("departureTime", sql.VarChar(8), tripData.departureTime)
-      .input("arrivalTime", sql.VarChar(8), tripData.arrivalTime)
+      .input("departureTime", sql.Time, tripData.departureTime)
+      .input("arrivalTime", sql.Time, tripData.arrivalTime)
       .input("departureDate", sql.Date, tripData.departureDate)
       .input("price", sql.Decimal(10, 2), tripData.price)
       .input("isActive", sql.Bit, tripData.isActive !== false).query(`
@@ -331,7 +331,7 @@ const createTrip = async (tripData) => {
         .input("tripId", sql.Int, tripId)
         .input("seatCode", sql.NVarChar, seatCode).query(`
           INSERT INTO Seats (TripId, SeatCode, SeatType, Status)
-          VALUES (@tripId, @seatCode, N'Thường', 'AVAILABLE')
+          VALUES (@tripId, @seatCode, 'STANDARD', 'AVAILABLE')
         `);
     }
 
@@ -386,8 +386,8 @@ const updateTrip = async (tripId, tripData) => {
       .input("routeId", sql.Int, tripData.routeId)
       .input("companyId", sql.Int, tripData.companyId)
       .input("busTypeId", sql.Int, tripData.busTypeId)
-      .input("departureTime", sql.VarChar(8), tripData.departureTime)
-      .input("arrivalTime", sql.VarChar(8), tripData.arrivalTime)
+      .input("departureTime", sql.Time, tripData.departureTime)
+      .input("arrivalTime", sql.Time, tripData.arrivalTime)
       .input("departureDate", sql.Date, tripData.departureDate)
       .input("price", sql.Decimal(10, 2), tripData.price)
       .input("isActive", sql.Bit, tripData.isActive).query(`
@@ -441,7 +441,7 @@ const updateTrip = async (tripId, tripData) => {
           .input("tripId4", sql.Int, tripId)
           .input("seatCode", sql.NVarChar, seatCode).query(`
             INSERT INTO Seats (TripId, SeatCode, SeatType, Status)
-            VALUES (@tripId4, @seatCode, N'Thường', 'AVAILABLE')
+            VALUES (@tripId4, @seatCode, 'STANDARD', 'AVAILABLE')
           `);
       }
     }
@@ -849,8 +849,8 @@ const getActiveTrips = async () => {
     const result = await pool.request().input("today", sql.Date, today).query(`
         SELECT TOP 8
           t.TripId,
-          t.DepartureTime,
-          t.ArrivalTime,
+          CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+          CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
           t.DepartureDate,
           t.Price as BasePrice,
           r.RouteName,
@@ -873,8 +873,8 @@ const getActiveTrips = async () => {
       const fallback = await pool.request().query(`
         SELECT TOP 8
           t.TripId,
-          t.DepartureTime,
-          t.ArrivalTime,
+          CONVERT(VARCHAR(5), t.DepartureTime, 108) AS DepartureTime,
+          CONVERT(VARCHAR(5), t.ArrivalTime, 108) AS ArrivalTime,
           t.DepartureDate,
           t.Price as BasePrice,
           r.RouteName,

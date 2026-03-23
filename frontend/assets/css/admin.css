@@ -237,7 +237,7 @@ body {
   background: var(--bg-body);
 }
 
-.sidebar.collapsed ~ .main-content {
+.sidebar.collapsed~.main-content {
   margin-left: 0;
 }
 
@@ -961,8 +961,27 @@ select:focus {
 
 /* ========== TABLE COLUMN FIXES ========== */
 .data-table td {
-  word-wrap: break-word;
+  word-break: break-word;
   max-width: 250px;
+}
+
+/* Specific column adjustments */
+.data-table td.col-id {
+  width: 60px;
+  max-width: 60px;
+  white-space: nowrap;
+}
+
+.data-table td.col-email {
+  max-width: 200px;
+}
+
+.data-table td.col-address {
+  max-width: 250px;
+}
+
+.data-table td.col-route {
+  max-width: 200px;
 }
 
 .chart-card h3 {
