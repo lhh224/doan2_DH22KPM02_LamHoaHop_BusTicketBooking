@@ -348,7 +348,7 @@ SELECT COUNT(*) AS TotalUsers FROM Users;
 
 ## Thong Tin Du An
 
-- Loai: Do an tot nghiep
+- Loai: Do an
 - Linh vuc: Dat ve xe khach truc tuyen
 - Nam: 2025
 - Nhom cong nghe: Node.js, Express, SQL Server, HTML, CSS, JavaScript
