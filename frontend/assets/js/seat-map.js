@@ -995,23 +995,26 @@ async function bookSeats() {
 
   // Validate
   if (selectedSeats.length === 0) {
-    alert("Vui lòng chọn ít nhất 1 ghế!");
+    showToast("Vui lòng chọn ít nhất 1 ghế!", "error");
     return;
   }
 
   if (!customerName || !customerPhone) {
-    alert("Vui lòng nhập đầy đủ thông tin họ tên và số điện thoại!");
+    showToast(
+      "Vui lòng nhập đầy đủ thông tin họ tên và số điện thoại!",
+      "error",
+    );
     return;
   }
 
   if (!fromStopOrder || !toStopOrder) {
-    alert("Vui lòng chọn điểm đón và điểm trả!");
+    showToast("Vui lòng chọn điểm đón và điểm trả!", "error");
     return;
   }
 
   // Disable button
   btnBook.disabled = true;
-  btnBook.textContent = "⏳ Đang xử lý...";
+  btnBook.textContent = "Đang xử lý...";
 
   try {
     const userStr = localStorage.getItem("user");
@@ -1060,23 +1063,57 @@ async function bookSeats() {
     sessionStorage.setItem("bookingData", JSON.stringify(data.data.booking));
 
     // Chuyển sang trang thanh toán
-    alert("✅ Đặt vé thành công! Chuyển sang trang thanh toán...");
-    window.location.href = `checkout.html?bookingId=${bookingId}`;
+    showToast("Đặt vé thành công! Chuyển sang trang thanh toán...", "success");
+    setTimeout(() => {
+      window.location.href = `checkout.html?bookingId=${bookingId}`;
+    }, 1500);
   } catch (error) {
     console.error("Lỗi đặt vé:", error);
-    alert("❌ Lỗi: " + error.message);
+    showToast("Lỗi: " + error.message, "error");
     btnBook.disabled = false;
     btnBook.textContent = "Đặt Vé Ngay";
   }
 }
 
 /**
+ * Hiển thị thông báo Toast
+ */
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.style.position = "fixed";
+  toast.style.top = "20px";
+  toast.style.right = "20px";
+  toast.style.padding = "15px 25px";
+  toast.style.background = type === "success" ? "#10b981" : "#ef4444";
+  toast.style.color = "white";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+  toast.style.zIndex = "9999";
+  toast.style.fontSize = "15px";
+  toast.style.fontWeight = "500";
+  toast.style.transform = "translateX(100%)";
+  toast.style.transition = "transform 0.3s ease-out";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  // Hiệu ứng trượt vào
+  requestAnimationFrame(() => {
+    toast.style.transform = "translateX(0)";
+  });
+
+  // Tự động biến mất
+  setTimeout(() => {
+    toast.style.transform = "translateX(100%)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/**
  * Hiển thị lỗi
  */
 function showError(message) {
-  const errorDiv = document.getElementById("errorMessage");
-  errorDiv.textContent = "❌ " + message;
-  errorDiv.style.display = "block";
+  showToast(message, "error");
 }
 
 /**

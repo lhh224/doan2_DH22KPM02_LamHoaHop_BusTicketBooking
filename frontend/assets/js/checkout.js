@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 function startCountdown(duration) {
   let timer = duration;
   const countdownElement = document.getElementById("countdown");
-  
+
   const interval = setInterval(() => {
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
@@ -55,7 +55,7 @@ function copyContent() {
     btnCopy.innerHTML = '<i class="fas fa-check"></i>';
     btnCopy.style.background = "var(--success-color)";
     btnCopy.style.color = "white";
-    
+
     setTimeout(() => {
       btnCopy.innerHTML = originalIcon;
       btnCopy.style.background = "";
@@ -100,11 +100,10 @@ function displayBookingInfo() {
     departureTime = departureTime.substring(0, 5);
   }
   const departureDate = new Date(bookingData.DepartureDate).toLocaleDateString(
-    "vi-VN"
+    "vi-VN",
   );
-  document.getElementById(
-    "departureInfo"
-  ).textContent = `${departureTime} - ${departureDate}`;
+  document.getElementById("departureInfo").textContent =
+    `${departureTime} - ${departureDate}`;
 
   document.getElementById("fromStop").textContent =
     bookingData.FromStopName || "-";
@@ -159,7 +158,7 @@ async function generateQRCode() {
     document.getElementById("qrLoading").style.display = "none";
   } catch (error) {
     console.error("Lỗi tạo QR:", error);
-    document.getElementById("qrLoading").textContent = "❌ Không thể tạo mã QR";
+    document.getElementById("qrLoading").textContent = "Không thể tạo mã QR";
   }
 }
 
@@ -168,11 +167,6 @@ async function generateQRCode() {
  */
 async function confirmPayment() {
   const btnConfirm = document.getElementById("btnConfirmPayment");
-
-  // Confirm dialog
-  if (!confirm("Bạn đã thanh toán thành công chưa?")) {
-    return;
-  }
 
   btnConfirm.disabled = true;
   btnConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
@@ -195,9 +189,7 @@ async function confirmPayment() {
     }
 
     // Hiển thị thông báo thành công
-    showSuccess(
-      "✅ Xác nhận thanh toán thành công! Đang chuyển sang trang vé..."
-    );
+    showSuccess("Xác nhận thanh toán thành công! Đang chuyển sang trang vé...");
 
     // Chuyển sang trang vé sau 2 giây
     setTimeout(() => {
@@ -207,7 +199,8 @@ async function confirmPayment() {
     console.error("Lỗi xác nhận thanh toán:", error);
     showError("Không thể xác nhận thanh toán: " + error.message);
     btnConfirm.disabled = false;
-    btnConfirm.innerHTML = '<i class="fas fa-check-circle"></i> Xác Nhận Đã Thanh Toán';
+    btnConfirm.innerHTML =
+      '<i class="fas fa-check-circle"></i> Xác Nhận Đã Thanh Toán';
   }
 }
 
@@ -234,36 +227,60 @@ async function cancelBooking() {
       throw new Error(data.message || "Không thể hủy đặt vé");
     }
 
-    alert("✅ Đã hủy đặt vé thành công!");
-    window.location.href = "index.html";
+    showToast("✅ Đã hủy đặt vé thành công!", "success");
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 1500);
   } catch (error) {
     console.error("Lỗi hủy booking:", error);
-    alert("❌ Không thể hủy đặt vé: " + error.message);
+    showToast("Không thể hủy đặt vé: " + error.message, "error");
     btnCancel.disabled = false;
     btnCancel.innerHTML = '<i class="fas fa-times-circle"></i> Hủy Đặt Vé';
   }
 }
 
 /**
+ * Hiển thị thông báo Toast
+ */
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.style.position = "fixed";
+  toast.style.top = "20px";
+  toast.style.right = "20px";
+  toast.style.padding = "15px 25px";
+  toast.style.background = type === "success" ? "#10b981" : "#ef4444";
+  toast.style.color = "white";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+  toast.style.zIndex = "9999";
+  toast.style.fontSize = "15px";
+  toast.style.fontWeight = "500";
+  toast.style.transform = "translateX(100%)";
+  toast.style.transition = "transform 0.3s ease-out";
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.transform = "translateX(0)";
+  });
+
+  setTimeout(() => {
+    toast.style.transform = "translateX(100%)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/**
  * Hiển thị lỗi
  */
 function showError(message) {
-  const errorDiv = document.getElementById("errorMessage");
-  const span = errorDiv.querySelector("span");
-  if (span) span.textContent = message;
-  else errorDiv.textContent = message;
-  errorDiv.style.display = "flex";
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(message, "error");
 }
 
 /**
  * Hiển thị thành công
  */
 function showSuccess(message) {
-  const successDiv = document.getElementById("successMessage");
-  const span = successDiv.querySelector("span");
-  if (span) span.textContent = message;
-  else successDiv.textContent = message;
-  successDiv.style.display = "flex";
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(message, "success");
 }

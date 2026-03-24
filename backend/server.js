@@ -102,7 +102,7 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err);
+  console.error("Server Error:", err);
   res.status(500).json({
     success: false,
     message: "Lỗi hệ thống",
@@ -115,33 +115,30 @@ const startServer = async () => {
   try {
     // Kiểm tra kết nối database
     await getPool();
-    console.log("✅ Kết nối database thành công");
+    console.log("Kết nối database thành công");
 
     // Lắng nghe port
     const PORT = config.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
-      console.log(`🌐 Frontend: http://localhost:${PORT}`);
-      console.log(`📚 API Health: http://localhost:${PORT}/health`);
-      console.log(
-        `⏰ Thời gian khởi động: ${new Date().toLocaleString("vi-VN")}`,
-      );
+      console.log(`Server đang chạy tại http://localhost:${PORT}`);
+      console.log(`Frontend: http://localhost:${PORT}`);
+      console.log(`Thời gian khởi động: ${new Date().toLocaleString("vi-VN")}`);
     });
   } catch (error) {
-    console.error("❌ Lỗi khởi động server:", error);
+    console.error("Lỗi khởi động server:", error);
     process.exit(1);
   }
 };
 
 // Xử lý shutdown gracefully
 process.on("SIGINT", async () => {
-  console.log("\n🛑 Đang tắt server...");
+  console.log("\nĐang tắt server...");
   await closePool();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
-  console.log("\n🛑 Đang tắt server...");
+  console.log("\nĐang tắt server...");
   await closePool();
   process.exit(0);
 });

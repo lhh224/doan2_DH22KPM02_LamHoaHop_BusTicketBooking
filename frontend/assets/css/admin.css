@@ -113,7 +113,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px 32px 24px;
+  padding: 0 24px 16px 24px;
   border-bottom: none;
   /* Removed border */
 }
@@ -181,13 +181,13 @@ body {
 
 /* Sidebar Footer */
 .sidebar-footer {
-  padding: 24px;
+  padding: 12px 24px;
   border-top: 1px solid var(--border-sidebar);
   background: transparent;
 }
 
 .admin-info {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .admin-name {
@@ -195,14 +195,14 @@ body {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
 .nav-home,
 .btn-logout {
   display: block;
   width: 100%;
-  padding: 10px 0;
+  padding: 8px 0;
   color: var(--text-sidebar);
   text-decoration: none;
   font-size: 13px;
@@ -237,7 +237,7 @@ body {
   background: var(--bg-body);
 }
 
-.sidebar.collapsed~.main-content {
+.sidebar.collapsed ~ .main-content {
   margin-left: 0;
 }
 

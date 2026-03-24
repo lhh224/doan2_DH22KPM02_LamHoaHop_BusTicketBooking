@@ -70,7 +70,7 @@ async function loadReviewsData() {
     const tbody = document.getElementById("reviewsPanelBody");
     const info = document.getElementById("reviewsPanelInfo");
     if (tbody)
-      tbody.innerHTML = `<tr class="loading-row"><td colspan="6" style="color:#ef4444">❌ Không thể tải dữ liệu. Kiểm tra server đang chạy.</td></tr>`;
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="6" style="color:#ef4444">Không thể tải dữ liệu. Kiểm tra server đang chạy.</td></tr>`;
     if (info) info.textContent = "Lỗi tải dữ liệu";
   }
 }
@@ -112,7 +112,6 @@ function renderReviewsPanelTable(data) {
         </td>
         <td>
           <span style="color:#FFB300;font-size:16px">${stars}</span>
-          <span style="margin-left:4px;font-weight:600">${r.Rating}/5</span>
         </td>
         <td>${formatDate(r.CreatedAt)}</td>
         <td><span class="status-badge ${st.cls}">${st.label}</span></td>

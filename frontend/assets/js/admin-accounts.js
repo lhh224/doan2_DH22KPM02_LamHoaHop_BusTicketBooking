@@ -32,7 +32,7 @@ async function renderAccountsSection() {
       </div>
       <div class="toolbar-right">
         <button class="btn btn-primary" onclick="openCreateStaffModal()">
-          Tạo Tài Khoản Nhân Viên
+          Tạo Tài Khoản
         </button>
       </div>
     </div>
@@ -98,12 +98,13 @@ function renderAccountsTable(data) {
   tbody.innerHTML = data
     .map((user) => {
       const roleBadge = {
-        ADMIN: '<span style="color:var(--text-primary); font-weight:700">ADMIN</span>',
-        STAFF: '<span style="color:var(--text-primary); font-weight:700">NHÂN VIÊN</span>',
-        CUSTOMER: '<span style="color:var(--text-primary); font-weight:700">KHÁCH HÀNG</span>',
+        ADMIN:
+          '<span style="color:var(--text-primary); font-weight:700">ADMIN</span>',
+        STAFF:
+          '<span style="color:var(--text-primary); font-weight:700">NHÂN VIÊN</span>',
+        CUSTOMER:
+          '<span style="color:var(--text-primary); font-weight:700">KHÁCH HÀNG</span>',
       };
-
-
 
       return `
       <tr data-context="account" data-item="${encodeURIComponent(JSON.stringify(user))}">
@@ -150,7 +151,9 @@ function filterAccounts() {
 
   if (statusFilter !== "") {
     const statusVal = statusFilter === "1";
-    filtered = filtered.filter((u) => (u.Status === statusVal || u.Status === parseInt(statusFilter)));
+    filtered = filtered.filter(
+      (u) => u.Status === statusVal || u.Status === parseInt(statusFilter),
+    );
   }
 
   renderAccountsTable(filtered);

@@ -38,16 +38,16 @@ const getPool = async () => {
       poolPromise = new sql.ConnectionPool(sqlConfig)
         .connect()
         .then((pool) => {
-          console.log("✅ Đã kết nối SQL Server thành công");
+          console.log("Đã kết nối SQL Server thành công");
           return pool;
         })
         .catch((err) => {
-          console.error("❌ Lỗi kết nối SQL Server:", err);
+          console.error("Lỗi kết nối SQL Server:", err);
           poolPromise = null;
           throw err;
         });
     } catch (error) {
-      console.error("❌ Lỗi khởi tạo pool:", error);
+      console.error("Lỗi khởi tạo pool:", error);
       throw error;
     }
   }
@@ -62,7 +62,7 @@ const closePool = async () => {
     const pool = await poolPromise;
     await pool.close();
     poolPromise = null;
-    console.log("🔒 Đã đóng connection pool SQL Server");
+    console.log("Đã đóng connection pool SQL Server");
   }
 };
 
