@@ -7,6 +7,7 @@ const API_BASE_URL = "http://localhost:3000/api/v1";
 
 let bookingId = null;
 let ticketData = null;
+let selectedRating = 0;
 
 /**
  * Khởi tạo trang
@@ -209,6 +210,203 @@ function displayTicketInfo() {
   // Hiển thị vé
   document.getElementById("loadingMessage").style.display = "none";
   document.getElementById("ticketContent").style.display = "block";
+
+  // Render khu vực đánh giá cho vé đã thanh toán
+  renderReviewSection();
+}
+
+async function renderReviewSection() {
+  const reviewCard = document.getElementById("reviewCard");
+  const reviewContainer = document.getElementById("reviewContainer");
+
+  if (!reviewCard || !reviewContainer || !ticketData?.BookingId) {
+    return;
+  }
+
+  reviewCard.style.display = "block";
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    reviewContainer.innerHTML = `
+      <p class="review-note">Bạn cần đăng nhập tài khoản đã đặt vé để gửi đánh giá.</p>
+      <a href="/pages/login.html" class="btn btn-primary">Đăng nhập để đánh giá</a>
+    `;
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/reviews`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Không thể tải dữ liệu đánh giá");
+    }
+
+    const existingReview = (data.data || []).find(
+      (r) => Number(r.BookingId) === Number(ticketData.BookingId),
+    );
+
+    if (existingReview) {
+      showExistingReview(existingReview);
+      return;
+    }
+
+    showReviewForm();
+  } catch (error) {
+    reviewContainer.innerHTML = `
+      <p class="review-note">Không thể tải khu vực đánh giá. Vui lòng thử lại sau.</p>
+    `;
+  }
+}
+
+function showExistingReview(review) {
+  const reviewContainer = document.getElementById("reviewContainer");
+  const stars = "★".repeat(review.Rating) + "☆".repeat(5 - review.Rating);
+  const createdAt = review.CreatedAt
+    ? new Date(review.CreatedAt).toLocaleString("vi-VN")
+    : "";
+
+  reviewContainer.innerHTML = `
+    <p class="review-note">Bạn đã đánh giá chuyến đi này.</p>
+    <div class="review-summary">
+      <div class="review-stars-display">${stars}</div>
+      <div><strong>${review.Title || "Đánh giá của bạn"}</strong></div>
+      <p style="margin: 0.5rem 0 0; color: #334155">${review.Content || ""}</p>
+      <div class="review-meta">Trạng thái: ${review.Status || "PENDING"} • ${createdAt}</div>
+    </div>
+  `;
+}
+
+function showReviewForm() {
+  const reviewContainer = document.getElementById("reviewContainer");
+  selectedRating = 0;
+
+  reviewContainer.innerHTML = `
+    <p class="review-note">Chia sẻ trải nghiệm của bạn để giúp hành khách khác chọn chuyến tốt hơn.</p>
+
+    <div class="review-form-group">
+      <label>Mức độ hài lòng</label>
+      <div class="rating-stars" id="ratingStars">
+        <button type="button" class="rating-star" data-value="1"><i class="fas fa-star"></i></button>
+        <button type="button" class="rating-star" data-value="2"><i class="fas fa-star"></i></button>
+        <button type="button" class="rating-star" data-value="3"><i class="fas fa-star"></i></button>
+        <button type="button" class="rating-star" data-value="4"><i class="fas fa-star"></i></button>
+        <button type="button" class="rating-star" data-value="5"><i class="fas fa-star"></i></button>
+      </div>
+    </div>
+
+    <div class="review-form-group">
+      <label for="reviewTitle">Tiêu đề</label>
+      <input id="reviewTitle" type="text" maxlength="200" placeholder="Ví dụ: Dịch vụ tốt, xe sạch sẽ" />
+    </div>
+
+    <div class="review-form-group">
+      <label for="reviewContent">Nội dung</label>
+      <textarea id="reviewContent" maxlength="2000" placeholder="Mô tả trải nghiệm chuyến đi của bạn..."></textarea>
+    </div>
+
+    <button type="button" class="review-submit-btn" id="reviewSubmitBtn">
+      Gửi đánh giá
+    </button>
+
+    <div id="reviewMessage" class="review-message"></div>
+  `;
+
+  bindReviewEvents();
+}
+
+function bindReviewEvents() {
+  const stars = Array.from(
+    document.querySelectorAll("#ratingStars .rating-star"),
+  );
+  const submitBtn = document.getElementById("reviewSubmitBtn");
+
+  stars.forEach((star) => {
+    star.addEventListener("click", () => {
+      selectedRating = Number(star.dataset.value);
+      stars.forEach((s) => {
+        s.classList.toggle("active", Number(s.dataset.value) <= selectedRating);
+      });
+    });
+  });
+
+  submitBtn.addEventListener("click", submitReview);
+}
+
+async function submitReview() {
+  const token = localStorage.getItem("token");
+  const titleInput = document.getElementById("reviewTitle");
+  const contentInput = document.getElementById("reviewContent");
+  const submitBtn = document.getElementById("reviewSubmitBtn");
+  const messageEl = document.getElementById("reviewMessage");
+
+  if (!token) {
+    messageEl.className = "review-message error";
+    messageEl.textContent = "Bạn cần đăng nhập để gửi đánh giá.";
+    return;
+  }
+
+  if (!selectedRating || selectedRating < 1 || selectedRating > 5) {
+    messageEl.className = "review-message error";
+    messageEl.textContent = "Vui lòng chọn số sao đánh giá.";
+    return;
+  }
+
+  const title = (titleInput.value || "").trim();
+  const content = (contentInput.value || "").trim();
+
+  if (!content) {
+    messageEl.className = "review-message error";
+    messageEl.textContent = "Vui lòng nhập nội dung đánh giá.";
+    return;
+  }
+
+  try {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Đang gửi...";
+    messageEl.textContent = "";
+
+    const response = await fetch(`${API_BASE_URL}/users/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        bookingId: Number(ticketData.BookingId),
+        rating: selectedRating,
+        title,
+        content,
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Không thể gửi đánh giá");
+    }
+
+    messageEl.className = "review-message success";
+    messageEl.textContent = "Gửi đánh giá thành công. Cảm ơn bạn!";
+
+    const submitted = {
+      Rating: selectedRating,
+      Title: title,
+      Content: content,
+      Status: "PENDING",
+      CreatedAt: new Date().toISOString(),
+    };
+    showExistingReview(submitted);
+  } catch (error) {
+    messageEl.className = "review-message error";
+    messageEl.textContent = error.message || "Gửi đánh giá thất bại.";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Gửi đánh giá";
+  }
 }
 
 /**
@@ -275,3 +473,4 @@ function setupSearchForm() {
     }
   });
 }
+

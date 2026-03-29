@@ -436,3 +436,4 @@ async function submitCreateBooking(event) {
     showAlert(e.message || "Lỗi khi tạo vé mới", "error");
   }
 }
+

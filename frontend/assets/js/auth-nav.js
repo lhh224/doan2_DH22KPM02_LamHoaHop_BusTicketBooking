@@ -19,10 +19,10 @@ function updateNavigationAuth() {
 
   // Tìm các menu item đăng nhập/đăng ký
   const loginItem = Array.from(navMenu.querySelectorAll("li")).find((li) =>
-    li.querySelector('a[href*="login.html"]'),
+    li.querySelector('a[href*="/pages/login.html"]'),
   );
   const registerItem = Array.from(navMenu.querySelectorAll("li")).find((li) =>
-    li.querySelector('a[href*="register.html"]'),
+    li.querySelector('a[href*="/pages/register.html"]'),
   );
 
   if (token && userStr) {
@@ -55,7 +55,7 @@ function updateNavigationAuth() {
       if (user.VaiTro === "ADMIN") {
         const adminMenuItem = document.createElement("li");
         adminMenuItem.innerHTML = `
-          <a href="admin.html" class="nav-link-black">
+          <a href="/pages/admin.html" class="nav-link-black">
             <i class="fas fa-cog"></i> Quản Trị
           </a>
         `;
@@ -81,6 +81,7 @@ function handleLogout(event) {
     localStorage.removeItem("user");
 
     // Chuyển về trang chủ
-    window.location.href = "index.html";
+    window.location.href = "/pages/index.html";
   }
 }
+

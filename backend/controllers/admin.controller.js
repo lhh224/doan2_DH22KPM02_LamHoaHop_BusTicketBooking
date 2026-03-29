@@ -621,12 +621,16 @@ const createStaffAccount = async (req, res) => {
   try {
     const { email, password, fullName, phone, address, role } = req.body;
 
-    if (!email || !password || !fullName) {
+    if (!password || !fullName) {
       return errorResponse(
         res,
-        "Thiếu thông tin bắt buộc (email, password, fullName)",
+        "Thiếu thông tin bắt buộc (password, fullName)",
         400,
       );
+    }
+
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return errorResponse(res, "Email không hợp lệ", 400);
     }
 
     if (role && !["STAFF", "ADMIN"].includes(role)) {

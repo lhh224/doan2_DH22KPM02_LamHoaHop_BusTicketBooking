@@ -30,14 +30,15 @@ He thong ho tro cac nghiep vu chinh:
 ```text
 BusTicketBooking/
 ├─ frontend/
-│  ├─ index.html
-│  ├─ login.html
-│  ├─ register.html
-│  ├─ seat-map.html
-│  ├─ checkout.html
-│  ├─ ticket.html
-│  ├─ trip-tracking.html
-│  ├─ admin.html
+│  ├─ pages/
+│  │  ├─ index.html
+│  │  ├─ login.html
+│  │  ├─ register.html
+│  │  ├─ seat-map.html
+│  │  ├─ checkout.html
+│  │  ├─ ticket.html
+│  │  ├─ trip-tracking.html
+│  │  └─ admin.html
 │  └─ assets/
 │     ├─ css/
 │     ├─ js/

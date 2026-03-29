@@ -118,9 +118,9 @@ loginForm.addEventListener("submit", async (e) => {
     // Chuyển hướng dựa vào vai trò
     setTimeout(() => {
       if (["ADMIN", "STAFF"].includes(result.data.user.VaiTro)) {
-        window.location.href = "admin.html#bookings";
+        window.location.href = "/pages/admin.html#bookings";
       } else {
-        window.location.href = "index.html";
+        window.location.href = "/pages/index.html";
       }
     }, 1500);
   } catch (error) {
@@ -158,3 +158,4 @@ window.addEventListener("DOMContentLoaded", () => {
       });
   }
 });
+

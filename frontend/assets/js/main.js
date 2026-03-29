@@ -660,7 +660,7 @@ function renderTripList(trips) {
             </div>
             <div class="trip-actions-search">
               <button class="btn-detail" onclick="toggleTripDetail(this)">Chi tiết <i class="fas fa-chevron-down"></i></button>
-              <button class="btn-select" onclick="location.href='seat-map.html?tripId=${t.TripId}'">Chọn chuyến</button>
+              <button class="btn-select" onclick="location.href='/pages/seat-map.html?tripId=${t.TripId}'">Chọn chuyến</button>
             </div>
           </div>
         </div>
@@ -891,14 +891,14 @@ function populateCitySelect(selectElement, cities, placeholder) {
  * Xem sơ đồ ghế
  */
 function viewSeats(tripId) {
-  window.location.href = `seat-map.html?tripId=${tripId}`;
+  window.location.href = `/pages/seat-map.html?tripId=${tripId}`;
 }
 
 /**
  * Đặt vé ngay
  */
 function bookNow(tripId) {
-  window.location.href = `seat-map.html?tripId=${tripId}`;
+  window.location.href = `/pages/seat-map.html?tripId=${tripId}`;
 }
 
 /**
@@ -1231,9 +1231,9 @@ function handleRouteClick(from, to) {
   // Khi click vào tuyến đường phổ biến, luôn tìm kiếm tất cả các chuyến từ hiện tại
   const date = "all";
 
-  // Nếu đang ở index.html, chỉ cần thay đổi query parameters và scroll lên
+  // Nếu đang ở /pages/index.html, chỉ cần thay đổi query parameters và scroll lên
   // Hoặc đổi URL rồi load lại trang
-  window.location.href = `index.html?from=${encodeURIComponent(
+  window.location.href = `/pages/index.html?from=${encodeURIComponent(
     from,
   )}&to=${encodeURIComponent(to)}&date=${date}`;
 }
@@ -1246,3 +1246,4 @@ window.DatVeNhanhApp = {
   showNotification,
   showLoading,
 };
+

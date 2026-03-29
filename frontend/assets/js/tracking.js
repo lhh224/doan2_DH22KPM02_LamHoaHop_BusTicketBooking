@@ -1754,3 +1754,4 @@ toastStyle.textContent = `
   }
 `;
 document.head.appendChild(toastStyle);
+

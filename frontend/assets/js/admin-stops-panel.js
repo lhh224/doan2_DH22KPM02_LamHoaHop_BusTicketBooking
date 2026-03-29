@@ -27,16 +27,6 @@ async function renderStopsSection() {
       </div>
     </div>
 
-    <!-- Thông tin tuyến đã chọn -->
-    <div id="stopRouteInfo" class="card" style="display:none; margin-bottom:16px;">
-      <div class="card-header">
-        <h3 id="stopRouteName">Tuyến đường</h3>
-      </div>
-      <div class="card-body">
-        <p id="stopRouteDetails" style="margin:0; color:#666;"></p>
-      </div>
-    </div>
-
     <div class="card">
       <div class="card-body no-padding">
         <div class="table-responsive">
@@ -55,7 +45,6 @@ async function renderStopsSection() {
           </table>
         </div>
       </div>
-      <div class="table-footer" style="display:none;"></div>
     </div>
   `;
 
@@ -85,26 +74,12 @@ async function onStopRouteChange() {
   if (!val) {
     stopsSelectedRouteId = null;
     document.getElementById("btnAddStop").disabled = true;
-    document.getElementById("stopRouteInfo").style.display = "none";
     document.getElementById("stopsPanelBody").innerHTML =
       '<tr class="loading-row"><td colspan="4">Vui lòng chọn tuyến đường</td></tr>';
-    document.getElementById("stopsPanelInfo").textContent = "Chọn tuyến đường";
     return;
   }
   stopsSelectedRouteId = parseInt(val);
   document.getElementById("btnAddStop").disabled = false;
-
-  // Hiển thị thông tin tuyến
-  const route = stopsRouteList.find(
-    (r) => (r.route_id || r.id) == stopsSelectedRouteId,
-  );
-  if (route) {
-    document.getElementById("stopRouteInfo").style.display = "block";
-    document.getElementById("stopRouteName").textContent =
-      route.route_name || route.name;
-    document.getElementById("stopRouteDetails").textContent =
-      `${route.departure_city || route.departureCity} → ${route.arrival_city || route.arrivalCity} | Khoảng cách: ${route.distance || 0} km`;
-  }
 
   await loadStopsPanel();
 }
@@ -130,12 +105,10 @@ async function loadStopsPanel() {
 
 function renderStopsPanelTable(data) {
   const tbody = document.getElementById("stopsPanelBody");
-  const info = document.getElementById("stopsPanelInfo");
 
   if (!data || data.length === 0) {
     tbody.innerHTML =
       '<tr class="loading-row"><td colspan="4">Chưa có điểm dừng nào</td></tr>';
-    info.textContent = "0 điểm dừng";
     return;
   }
 
@@ -160,8 +133,6 @@ function renderStopsPanelTable(data) {
   `;
     })
     .join("");
-
-  info.textContent = `Tổng: ${data.length} điểm dừng`;
 }
 
 function showStopDetail(stopId) {
@@ -336,3 +307,4 @@ async function deleteStopPanel(stopId) {
     showAlert(error.message || "Lỗi khi xóa điểm dừng", "error");
   }
 }
+

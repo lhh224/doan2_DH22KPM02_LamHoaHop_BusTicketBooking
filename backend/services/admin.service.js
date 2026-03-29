@@ -904,30 +904,57 @@ const getPaymentMethodStats = async (year = null) => {
 const createStaffAccount = async (userData) => {
   const pool = await getPool();
   const bcrypt = require("bcrypt");
+  const normalizedEmail = (userData.email || "").trim() || null;
 
-  // Kiểm tra email đã tồn tại
-  const check = await pool
-    .request()
-    .input("Email", sql.NVarChar, userData.email)
-    .query("SELECT UserId FROM Users WHERE Email = @Email");
+  // Email là optional, chỉ kiểm tra trùng khi có giá trị.
+  if (normalizedEmail) {
+    const check = await pool
+      .request()
+      .input("Email", sql.NVarChar, normalizedEmail)
+      .query("SELECT UserId FROM Users WHERE Email = @Email");
 
-  if (check.recordset.length > 0) {
-    throw new Error("Email đã được sử dụng");
+    if (check.recordset.length > 0) {
+      throw new Error("Email đã được sử dụng");
+    }
+  }
+
+  // Users.Username là NOT NULL + UNIQUE, nên tạo username tự động từ email.
+  const emailPrefix = (normalizedEmail || "")
+    .split("@")[0]
+    .trim()
+    .toLowerCase();
+  const baseUsername =
+    (emailPrefix || "staff").replace(/[^a-z0-9._-]/g, "").slice(0, 40) ||
+    "staff";
+
+  let username = baseUsername;
+  let suffix = 1;
+  while (true) {
+    const usernameCheck = await pool
+      .request()
+      .input("Username", sql.NVarChar, username)
+      .query("SELECT TOP 1 UserId FROM Users WHERE Username = @Username");
+
+    if (usernameCheck.recordset.length === 0) break;
+
+    suffix += 1;
+    username = `${baseUsername}${suffix}`.slice(0, 50);
   }
 
   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
   const result = await pool
     .request()
-    .input("Email", sql.NVarChar, userData.email)
+    .input("Username", sql.NVarChar, username)
+    .input("Email", sql.NVarChar, normalizedEmail)
     .input("Password", sql.NVarChar, hashedPassword)
     .input("FullName", sql.NVarChar, userData.fullName)
     .input("Phone", sql.NVarChar, userData.phone || null)
     .input("Address", sql.NVarChar, userData.address || null)
     .input("Role", sql.VarChar, userData.role || "STAFF").query(`
-      INSERT INTO Users (Email, Password, FullName, Phone, Address, Role, Status, EmailVerified)
-      OUTPUT INSERTED.UserId, INSERTED.Email, INSERTED.FullName, INSERTED.Role, INSERTED.Status, INSERTED.CreatedAt
-      VALUES (@Email, @Password, @FullName, @Phone, @Address, @Role, 1, 1)
+      INSERT INTO Users (Username, Email, Password, FullName, Phone, Address, Role, Status, EmailVerified)
+      OUTPUT INSERTED.UserId, INSERTED.Username, INSERTED.Email, INSERTED.FullName, INSERTED.Role, INSERTED.Status, INSERTED.CreatedAt
+      VALUES (@Username, @Email, @Password, @FullName, @Phone, @Address, @Role, 1, 1)
     `);
 
   return result.recordset[0];
@@ -1067,7 +1094,7 @@ const getTransactionLogs = async (filters = {}) => {
   let query = `
     SELECT 
       p.PaymentId, p.BookingId, p.Amount, p.PaymentMethod,
-      p.Status, p.ExternalTransactionId, p.Note, p.CreatedAt,
+      p.Status, p.TransactionId, p.Note, p.CreatedAt,
       b.CustomerName, b.CustomerPhone, b.TicketCode,
       r.RouteName
     FROM Payments p

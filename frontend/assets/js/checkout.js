@@ -7,6 +7,7 @@ const API_BASE_URL = "http://localhost:3000/api/v1";
 
 let bookingId = null;
 let bookingData = null;
+let transactionId = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Lấy bookingId từ URL
@@ -152,6 +153,7 @@ async function generateQRCode() {
 
     // Hiển thị nội dung QR
     document.getElementById("qrContent").textContent = data.data.qrContent;
+    transactionId = data.data.transactionId || null;
     document.getElementById("qrInfo").style.display = "block";
 
     // Ẩn loading
@@ -172,6 +174,12 @@ async function confirmPayment() {
   btnConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
   try {
+    if (!transactionId) {
+      throw new Error(
+        "Không tìm thấy mã giao dịch từ QR. Vui lòng tải lại mã QR.",
+      );
+    }
+
     const response = await fetch(`${API_BASE_URL}/bookings/confirm`, {
       method: "POST",
       headers: {
@@ -179,6 +187,8 @@ async function confirmPayment() {
       },
       body: JSON.stringify({
         bookingId: bookingId,
+        paymentMethod: "QR",
+        transactionId: transactionId,
       }),
     });
 
@@ -193,7 +203,7 @@ async function confirmPayment() {
 
     // Chuyển sang trang vé sau 2 giây
     setTimeout(() => {
-      window.location.href = `ticket.html?bookingId=${bookingId}&success=true`;
+      window.location.href = `/pages/ticket.html?bookingId=${bookingId}&success=true`;
     }, 2000);
   } catch (error) {
     console.error("Lỗi xác nhận thanh toán:", error);
@@ -229,7 +239,7 @@ async function cancelBooking() {
 
     showToast("✅ Đã hủy đặt vé thành công!", "success");
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = "/pages/index.html";
     }, 1500);
   } catch (error) {
     console.error("Lỗi hủy booking:", error);
@@ -284,3 +294,4 @@ function showError(message) {
 function showSuccess(message) {
   showToast(message, "success");
 }
+

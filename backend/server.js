@@ -56,35 +56,35 @@ app.use("/api/v1/tracking", trackingRoutes);
 
 // Serve frontend HTML pages (phải đặt sau API routes)
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/index.html"));
 });
 
 app.get("/seat-map", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/seat-map.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/seat-map.html"));
 });
 
 app.get("/checkout", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/checkout.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/checkout.html"));
 });
 
 app.get("/ticket", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/ticket.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/ticket.html"));
 });
 
 app.get("/trip-tracking", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/trip-tracking.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/trip-tracking.html"));
 });
 
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/admin.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/admin.html"));
 });
 
 app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/login.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/login.html"));
 });
 
 app.get("/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/register.html"));
+  res.sendFile(path.join(__dirname, "../frontend/pages/register.html"));
 });
 
 // 404 handler cho API endpoints
@@ -97,7 +97,9 @@ app.use("/api", (req, res) => {
 
 // 404 handler cho các route khác
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "../frontend/index.html"));
+  res
+    .status(404)
+    .sendFile(path.join(__dirname, "../frontend/pages/index.html"));
 });
 
 // Error handler

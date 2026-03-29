@@ -1,15 +1,5 @@
-/**
- * File: tracking.service.js
- * Mục đích: Xử lý logic theo dõi hành trình xe khách
- * Bao gồm: lấy thông tin tracking, điểm dừng, giả lập vị trí xe
- */
-
 const { getPool, sql } = require("../config/db");
 
-/**
- * Tọa độ các thành phố/tỉnh Việt Nam (dùng cho giả lập GPS)
- * Trong thực tế, dữ liệu này sẽ đến từ thiết bị GPS trên xe
- */
 const CITY_COORDINATES = {
   "TP.HCM": { lat: 10.7769, lng: 106.7009 },
   "Hồ Chí Minh": { lat: 10.7769, lng: 106.7009 },
@@ -66,7 +56,7 @@ const getTripTrackingData = async (tripId) => {
       tracking: position,
     };
   } catch (error) {
-    console.error("❌ Lỗi lấy tracking data:", error);
+    console.error("Lỗi lấy tracking data:", error);
     throw error;
   }
 };
@@ -114,7 +104,7 @@ const getTripStopsWithStatus = async (tripId) => {
             : "upcoming",
     }));
   } catch (error) {
-    console.error("❌ Lỗi lấy điểm dừng:", error);
+    console.error("Lỗi lấy điểm dừng:", error);
     throw error;
   }
 };
@@ -141,7 +131,7 @@ const getSimulatedPosition = async (tripId) => {
     const trip = result.recordset[0];
     return calculateSimulatedPosition(trip);
   } catch (error) {
-    console.error("❌ Lỗi lấy vị trí xe:", error);
+    console.error("Lỗi lấy vị trí xe:", error);
     throw error;
   }
 };
@@ -242,7 +232,7 @@ const getAllRoutesWithCoordinates = async () => {
       stops: stopsMap[route.routeId] || [],
     }));
   } catch (error) {
-    console.error("❌ Lỗi lấy danh sách routes:", error);
+    console.error("Lỗi lấy danh sách routes:", error);
     throw error;
   }
 };
@@ -279,7 +269,7 @@ const getActiveTrips = async () => {
     `);
     return result.recordset;
   } catch (error) {
-    console.error("❌ Lỗi lấy danh sách trips:", error);
+    console.error("Lỗi lấy danh sách trips:", error);
     throw error;
   }
 };

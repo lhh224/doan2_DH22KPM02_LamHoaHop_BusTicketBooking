@@ -7,14 +7,8 @@ const API_BASE = "http://localhost:3000/api/v1";
 let currentSection = "dashboard";
 let currentUser = null;
 
-// ========================================
-// KHỞI TẠO
-// ========================================
-document.addEventListener("DOMContentLoaded", async () => {
-  await checkAdminAuth();
-  setupSidebar();
-  // Đọc section từ URL hash (hỗ trợ redirect từ các trang standalone cũ)
-  const validSections = [
+function getAllowedSectionsByRole() {
+  const allSections = [
     "dashboard",
     "companies",
     "routes",
@@ -26,9 +20,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     "bookings",
     "reviews",
   ];
+
+  if (!currentUser || currentUser.VaiTro === "ADMIN") return allSections;
+  if (currentUser.VaiTro === "STAFF") {
+    return allSections.filter((s) => !["accounts", "logs"].includes(s));
+  }
+
+  return [];
+}
+
+// ========================================
+// KHỞI TẠO
+// ========================================
+document.addEventListener("DOMContentLoaded", async () => {
+  await checkAdminAuth();
+  setupSidebar();
+  // Đọc section từ URL hash (hỗ trợ redirect từ các trang standalone cũ)
+  const validSections = getAllowedSectionsByRole();
   const hashSection = window.location.hash.slice(1);
-  const fallbackSection =
-    currentUser && currentUser.VaiTro === "STAFF" ? "bookings" : "dashboard";
+  const fallbackSection = "dashboard";
   loadSection(
     validSections.includes(hashSection) ? hashSection : fallbackSection,
   );
@@ -43,7 +53,7 @@ async function checkAdminAuth() {
 
   if (!token || !userStr) {
     alert("⚠️ Bạn cần đăng nhập với tài khoản Admin!");
-    window.location.href = "/login.html";
+    window.location.href = "/pages/login.html";
     return;
   }
 
@@ -51,7 +61,7 @@ async function checkAdminAuth() {
     currentUser = JSON.parse(userStr);
     if (!["ADMIN", "STAFF"].includes(currentUser.VaiTro)) {
       alert("⚠️ Chỉ tài khoản Admin hoặc Nhà xe mới có quyền truy cập!");
-      window.location.href = "/index.html";
+      window.location.href = "/pages/index.html";
       return;
     }
 
@@ -60,24 +70,17 @@ async function checkAdminAuth() {
     document.getElementById("sidebarAdminName").textContent = adminName;
     document.getElementById("topAdminName").textContent = adminName;
 
-    // Hiện mục Tài khoản nếu là admin
+    // Hiện/ẩn menu theo quyền
     const navAccounts = document.getElementById("navAccounts");
+    const navLogs = document.querySelector('.nav-item[data-section="logs"]');
     if (navAccounts)
       navAccounts.style.display = currentUser.VaiTro === "ADMIN" ? "" : "none";
-
-    // STAFF chỉ sử dụng khu vực Đặt Vé
-    if (currentUser.VaiTro === "STAFF") {
-      document.querySelectorAll(".nav-item[data-section]").forEach((item) => {
-        const section = item.getAttribute("data-section");
-        if (section !== "bookings") {
-          item.style.display = "none";
-        }
-      });
-    }
+    if (navLogs)
+      navLogs.style.display = currentUser.VaiTro === "ADMIN" ? "" : "none";
   } catch (error) {
     console.error("Lỗi parse user:", error);
     localStorage.clear();
-    window.location.href = "/login.html";
+    window.location.href = "/pages/login.html";
   }
 }
 
@@ -129,6 +132,11 @@ function setupSidebar() {
  * Chuyển section
  */
 function loadSection(section) {
+  const allowedSections = getAllowedSectionsByRole();
+  if (!allowedSections.includes(section)) {
+    section = "dashboard";
+  }
+
   currentSection = section;
 
   // Cập nhật active state
@@ -347,7 +355,10 @@ const ContextMenu = {
       case "booking":
         const isPending = data.Status === "PENDING";
         const bookingItems = [
-          { label: "Xem chi tiết", action: `showBookingDetail(${data.BookingId})` }
+          {
+            label: "Xem chi tiết",
+            action: `showBookingDetail(${data.BookingId})`,
+          },
         ];
         if (isPending) {
           bookingItems.push({ separator: true });
@@ -362,6 +373,26 @@ const ContextMenu = {
           });
         }
         return bookingItems;
+      case "review":
+        const reviewItems = [
+          {
+            label: "Xem chi tiết",
+            action: `showReviewDetail(${data.ReviewId})`,
+          },
+        ];
+        if (data.Status === "PENDING") {
+          reviewItems.push({ separator: true });
+          reviewItems.push({
+            label: "Duyệt đánh giá",
+            action: `approveReview(${data.ReviewId})`,
+          });
+          reviewItems.push({
+            label: "Từ chối đánh giá",
+            action: `rejectReview(${data.ReviewId})`,
+            danger: true,
+          });
+        }
+        return reviewItems;
       default:
         return [];
     }
@@ -398,7 +429,7 @@ async function adminFetch(url, options = {}) {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     alert("⚠️ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-    window.location.href = "/login.html";
+    window.location.href = "/pages/login.html";
     throw new Error("Token không hợp lệ hoặc đã hết hạn.");
   }
 
@@ -501,7 +532,7 @@ function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
-    window.location.href = "/login.html";
+    window.location.href = "/pages/login.html";
   }
 }
 

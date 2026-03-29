@@ -154,7 +154,7 @@ GO
 CREATE TABLE Users (
   UserId INT IDENTITY(1,1) PRIMARY KEY,
   Username NVARCHAR(50) NOT NULL UNIQUE,
-  Email NVARCHAR(100) NOT NULL UNIQUE,
+  Email NVARCHAR(100) NULL,
   Password NVARCHAR(255) NOT NULL,
   FullName NVARCHAR(100) NOT NULL,
   Phone NVARCHAR(20),
@@ -209,7 +209,6 @@ CREATE TABLE Payments (
   PaymentMethod NVARCHAR(50),
   Status VARCHAR(20) DEFAULT 'PENDING' CHECK (Status IN ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED')),
   TransactionId NVARCHAR(100),
-  ExternalTransactionId NVARCHAR(100),
   Note NVARCHAR(500),
   PaymentDate DATETIME DEFAULT GETDATE(),
   CreatedAt DATETIME DEFAULT GETDATE(),
@@ -282,7 +281,7 @@ CREATE INDEX IX_Bookings_TicketCode ON Bookings(TicketCode);
 CREATE INDEX IX_BookingDetails_BookingId ON BookingDetails(BookingId);
 CREATE INDEX IX_Stops_RouteId ON Stops(RouteId);
 CREATE INDEX IX_Users_Username ON Users(Username);
-CREATE INDEX IX_Users_Email ON Users(Email);
+CREATE UNIQUE INDEX UX_Users_Email_NotNull ON Users(Email) WHERE Email IS NOT NULL;
 CREATE INDEX IX_Sessions_UserId ON Sessions(UserId);
 CREATE INDEX IX_Sessions_Status ON Sessions(Status);
 CREATE INDEX IX_Notifications_UserId ON Notifications(UserId);
@@ -448,8 +447,8 @@ BEGIN
     WHERE BookingId = @BookingId;
 
     -- 3. Thêm bản ghi thanh toán (gộp cả lịch sử giao dịch)
-    INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, ExternalTransactionId, Note, PaymentDate, CreatedAt)
-    VALUES (@BookingId, @TotalAmount, @PaymentMethod, 'COMPLETED', @TransactionId, @TransactionId, N'Thanh toán thành công', GETDATE(), GETDATE());
+    INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, Note, PaymentDate, CreatedAt)
+    VALUES (@BookingId, @TotalAmount, @PaymentMethod, 'COMPLETED', @TransactionId, N'Thanh toán thành công', GETDATE(), GETDATE());
 
     COMMIT TRANSACTION;
 
@@ -648,9 +647,9 @@ INSERT INTO BookingDetails (BookingId, SeatCode, Price) VALUES
 GO
 
 -- 5.10: Thanh toán (Payments) - gộp dữ liệu từ Payments + Transactions cũ
-INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, ExternalTransactionId, Note, PaymentDate) VALUES
-(1, 700000, N'QR', 'COMPLETED', 'TXN-20250701-001', 'TXN-20250701-001', N'Thanh toán qua QR Code - Chuyến TP.HCM → Đà Lạt', DATEADD(day, -1, GETDATE())),
-(2, 250000, N'QR', 'COMPLETED', 'TXN-20250701-002', 'TXN-20250701-002', N'Thanh toán qua QR Code - Chuyến TP.HCM → Nha Trang', DATEADD(day, -1, GETDATE()));
+INSERT INTO Payments (BookingId, Amount, PaymentMethod, Status, TransactionId, Note, PaymentDate) VALUES
+(1, 700000, N'QR', 'COMPLETED', 'TXN-20250701-001', N'Thanh toán qua QR Code - Chuyến TP.HCM → Đà Lạt', DATEADD(day, -1, GETDATE())),
+(2, 250000, N'QR', 'COMPLETED', 'TXN-20250701-002', N'Thanh toán qua QR Code - Chuyến TP.HCM → Nha Trang', DATEADD(day, -1, GETDATE()));
 GO
 
 -- 5.11: Đánh giá (Reviews)

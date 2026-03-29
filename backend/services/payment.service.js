@@ -5,6 +5,12 @@
 
 const { generateQRCode } = require("../libs/qr");
 
+const createTransactionId = () => {
+  const timestamp = Date.now().toString().slice(-8);
+  const randomPart = Math.floor(100000 + Math.random() * 900000);
+  return `TXN${timestamp}${randomPart}`;
+};
+
 /**
  * Tạo mã QR thanh toán cho booking
  * @param {object} paymentData - Thông tin thanh toán
@@ -13,6 +19,7 @@ const { generateQRCode } = require("../libs/qr");
 const generatePaymentQR = async (paymentData) => {
   try {
     const { bookingId, amount, customerName, ticketCode } = paymentData;
+    const transactionId = createTransactionId();
 
     // Hàm loại bỏ dấu tiếng Việt và khoảng trắng
     const formatName = (str) => {
@@ -26,8 +33,8 @@ const generatePaymentQR = async (paymentData) => {
 
     const cleanName = formatName(customerName || "Khach");
 
-    // Tạo nội dung QR (Tên viết liền + Mã vé)
-    const qrContent = `${cleanName} ${ticketCode || "VE" + bookingId}`;
+    // Tạo nội dung QR có kèm mã giao dịch để đối soát demo
+    const qrContent = `${cleanName} ${ticketCode || "VE" + bookingId} ${transactionId}`;
 
     // Sinh mã QR
     const qrImage = await generateQRCode(qrContent);
@@ -35,6 +42,7 @@ const generatePaymentQR = async (paymentData) => {
     return {
       qrContent: qrContent,
       qrImage: qrImage, // Data URL (base64)
+      transactionId: transactionId,
       bookingId: bookingId,
       amount: amount,
     };

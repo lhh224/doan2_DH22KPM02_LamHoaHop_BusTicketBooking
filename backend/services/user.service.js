@@ -106,7 +106,7 @@ const getBookingDetail = async (userId, bookingId) => {
           FOR JSON PATH
         ) as SeatDetails,
         (
-          SELECT TOP 1 PaymentMethod, Status, CreatedAt, ExternalTransactionId
+          SELECT TOP 1 PaymentMethod, Status, CreatedAt, TransactionId
           FROM Payments
           WHERE BookingId = b.BookingId
           ORDER BY CreatedAt DESC

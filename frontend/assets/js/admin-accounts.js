@@ -171,8 +171,8 @@ function openCreateStaffModal() {
           <input type="text" id="staffFullName" required placeholder="Nhập họ tên" />
         </div>
         <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="staffEmail" required placeholder="email@example.com" />
+          <label>Email</label>
+          <input type="email" id="staffEmail" placeholder="email@example.com" />
         </div>
       </div>
       <div class="form-row">
@@ -215,7 +215,7 @@ async function submitCreateStaff(e) {
   e.preventDefault();
 
   const data = {
-    email: document.getElementById("staffEmail").value,
+    email: document.getElementById("staffEmail").value.trim() || null,
     password: document.getElementById("staffPassword").value,
     fullName: document.getElementById("staffFullName").value,
     phone: document.getElementById("staffPhone").value || null,
@@ -259,3 +259,4 @@ async function toggleLockAccount(userId, action) {
     showAlert(error.message || `Lỗi khi ${actionText} tài khoản`, "error");
   }
 }
+

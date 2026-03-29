@@ -1065,7 +1065,7 @@ async function bookSeats() {
     // Chuyển sang trang thanh toán
     showToast("Đặt vé thành công! Chuyển sang trang thanh toán...", "success");
     setTimeout(() => {
-      window.location.href = `checkout.html?bookingId=${bookingId}`;
+      window.location.href = `/pages/checkout.html?bookingId=${bookingId}`;
     }, 1500);
   } catch (error) {
     console.error("Lỗi đặt vé:", error);
@@ -1198,3 +1198,4 @@ function safeFormatDate(dateInput) {
 function hideLoading() {
   document.getElementById("loadingMessage").style.display = "none";
 }
+

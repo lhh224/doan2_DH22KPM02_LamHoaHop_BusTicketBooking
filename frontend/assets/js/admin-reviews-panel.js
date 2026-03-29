@@ -26,6 +26,9 @@ async function renderReviewsSection() {
           oninput="filterReviewsPanel()" style="max-width: 300px;" />
         <div class="toolbar-info" id="reviewsPanelInfo"
           style="display: flex; gap: 8px; align-items: center;">Đang tải...</div>
+        <div style="font-size: 12px; color: #64748b;">
+          Chuột phải lên dòng đánh giá để thao tác
+        </div>
       </div>
     </div>
 
@@ -40,11 +43,10 @@ async function renderReviewsSection() {
                 <th>Đánh Giá</th>
                 <th>Ngày Gửi</th>
                 <th>Trạng Thái</th>
-                <th>Thao Tác</th>
               </tr>
             </thead>
             <tbody id="reviewsPanelBody">
-              <tr class="loading-row"><td colspan="6"><span class="spinner"></span> Đang tải...</td></tr>
+              <tr class="loading-row"><td colspan="5"><span class="spinner"></span> Đang tải...</td></tr>
             </tbody>
           </table>
         </div>
@@ -70,7 +72,7 @@ async function loadReviewsData() {
     const tbody = document.getElementById("reviewsPanelBody");
     const info = document.getElementById("reviewsPanelInfo");
     if (tbody)
-      tbody.innerHTML = `<tr class="loading-row"><td colspan="6" style="color:#ef4444">Không thể tải dữ liệu. Kiểm tra server đang chạy.</td></tr>`;
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="5" style="color:#ef4444">Không thể tải dữ liệu. Kiểm tra server đang chạy.</td></tr>`;
     if (info) info.textContent = "Lỗi tải dữ liệu";
   }
 }
@@ -84,7 +86,7 @@ function renderReviewsPanelTable(data) {
 
   if (!data || data.length === 0) {
     tbody.innerHTML =
-      '<tr class="loading-row"><td colspan="6">Không có đánh giá nào</td></tr>';
+      '<tr class="loading-row"><td colspan="5">Không có đánh giá nào</td></tr>';
     info.textContent = "0 đánh giá";
     return;
   }
@@ -99,9 +101,8 @@ function renderReviewsPanelTable(data) {
     .map((r) => {
       const st = statusMap[r.Status] || { label: r.Status, cls: "" };
       const stars = "★".repeat(r.Rating) + "☆".repeat(5 - r.Rating);
-      const isPending = r.Status === "PENDING";
       return `
-      <tr data-context="review" data-item="${encodeURIComponent(JSON.stringify(r))}">
+      <tr data-context="review" data-item="${encodeURIComponent(JSON.stringify(r))}" style="cursor: context-menu" title="Chuột phải để thao tác">
         <td>
           <div style="font-weight:600">${r.UserName || "Ẩn danh"}</div>
           <div style="font-size:12px;color:#888">${r.Email || ""}</div>
@@ -115,13 +116,6 @@ function renderReviewsPanelTable(data) {
         </td>
         <td>${formatDate(r.CreatedAt)}</td>
         <td><span class="status-badge ${st.cls}">${st.label}</span></td>
-        <td>
-          <div class="btn-group">
-            <button class="btn btn-sm btn-secondary" onclick="showReviewDetail(${r.ReviewId})">Chi tiết</button>
-            ${isPending ? `<button class="btn btn-sm btn-success" onclick="approveReview(${r.ReviewId})">Duyệt</button>` : ""}
-            ${isPending ? `<button class="btn btn-sm btn-danger" onclick="rejectReview(${r.ReviewId})">Từ chối</button>` : ""}
-          </div>
-        </td>
       </tr>`;
     })
     .join("");
@@ -182,8 +176,7 @@ function showReviewDetail(reviewId) {
       <tr><td style="padding:10px 0;color:#888">Trạng Thái</td><td style="padding:10px 0">${statusLabel[r.Status] || r.Status}</td></tr>
     </table>
     <div class="form-actions" style="margin-top:16px">
-      <button class="btn btn-secondary" onclick="closeGlobalModal()">Đóng</button>
-      ${r.Status === "PENDING" ? `<button class="btn btn-success" onclick="closeGlobalModal(); approveReview(${r.ReviewId})">✓ Duyệt</button>` : ""}
+      ${r.Status === "PENDING" ? `<button class="btn btn-primary" onclick="closeGlobalModal(); approveReview(${r.ReviewId})">Duyệt</button>` : ""}
       ${r.Status === "PENDING" ? `<button class="btn btn-danger" onclick="closeGlobalModal(); rejectReview(${r.ReviewId})">Từ Chối</button>` : ""}
     </div>
   `;
@@ -222,3 +215,4 @@ async function rejectReview(reviewId) {
     showAlert(e.message || "Lỗi khi từ chối đánh giá", "error");
   }
 }
+

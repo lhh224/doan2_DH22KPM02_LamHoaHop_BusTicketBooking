@@ -175,7 +175,7 @@ async function loadTransactionLogs() {
         <td><strong style="color:var(--success)">${formatCurrency(log.Amount)}</strong></td>
         <td>${log.PaymentMethod || "--"}</td>
         <td>${statusBadge(log.Status)}</td>
-        <td><small>${log.ExternalTransactionId || "--"}</small></td>
+        <td><small>${log.TransactionId || "--"}</small></td>
         <td><small>${log.Note || "--"}</small></td>
         <td>${formatDateTime(log.CreatedAt)}</td>
       </tr>
@@ -253,3 +253,4 @@ async function loadLoginLogs() {
       '<tr class="loading-row"><td colspan="9">Lỗi khi tải dữ liệu</td></tr>';
   }
 }
+

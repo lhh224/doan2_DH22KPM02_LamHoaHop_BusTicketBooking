@@ -218,7 +218,7 @@ registerForm.addEventListener("submit", async (e) => {
 
     // Chuyển hướng
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = "/pages/index.html";
     }, 1500);
   } catch (error) {
     console.error("Register error:", error);
@@ -253,7 +253,7 @@ window.addEventListener("DOMContentLoaded", () => {
       .then((response) => {
         if (response.ok) {
           // Token còn hợp lệ, redirect về trang chủ
-          window.location.href = "index.html";
+          window.location.href = "/pages/index.html";
         }
       })
       .catch((err) => {
@@ -262,3 +262,4 @@ window.addEventListener("DOMContentLoaded", () => {
       });
   }
 });
+

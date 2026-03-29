@@ -69,6 +69,10 @@ const confirmPayment = async (req, res) => {
       return errorResponse(res, "Vui lòng cung cấp bookingId", 400);
     }
 
+    if (!transactionId) {
+      return errorResponse(res, "Vui lòng cung cấp transactionId", 400);
+    }
+
     const payment = await bookingService.confirmPayment(
       bookingId,
       paymentMethod,

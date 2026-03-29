@@ -29,8 +29,8 @@ router.post(
   adminController.createManualBooking,
 );
 
-// Các routes còn lại chỉ dành cho ADMIN
-router.use(requireAdmin);
+// Mặc định khu admin cho cả ADMIN/STAFF
+router.use(requireStaff);
 
 // Dashboard
 router.get("/dashboard/stats", adminController.getDashboardStats);
@@ -72,8 +72,8 @@ router.delete("/trips/:tripId", tripController.deleteTrip);
 router.get("/bus-types", tripController.getBusTypes);
 
 // Users management
-router.get("/users", adminController.getAllUsers);
-router.put("/users/:id/status", adminController.updateUserStatus);
+router.get("/users", requireAdmin, adminController.getAllUsers);
+router.put("/users/:id/status", requireAdmin, adminController.updateUserStatus);
 
 // Reviews management
 router.get("/reviews", adminController.getAllReviews);
@@ -86,11 +86,23 @@ router.get("/stats/revenue-by-route", adminController.getRevenueByRoute);
 router.get("/stats/payment-methods", adminController.getPaymentMethodStats);
 
 // Quản lý tài khoản
-router.post("/accounts/create-staff", adminController.createStaffAccount);
-router.put("/accounts/:id/toggle-lock", adminController.toggleUserLock);
+router.post(
+  "/accounts/create-staff",
+  requireAdmin,
+  adminController.createStaffAccount,
+);
+router.put(
+  "/accounts/:id/toggle-lock",
+  requireAdmin,
+  adminController.toggleUserLock,
+);
 
 // Log
-router.get("/logs/transactions", adminController.getTransactionLogs);
-router.get("/logs/logins", adminController.getLoginLogs);
+router.get(
+  "/logs/transactions",
+  requireAdmin,
+  adminController.getTransactionLogs,
+);
+router.get("/logs/logins", requireAdmin, adminController.getLoginLogs);
 
 module.exports = router;
